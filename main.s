@@ -1,5 +1,5 @@
 ;****************** main.s ***************
-; Program written by: ***Your Names**update this***
+; Program written by: *Sebastian Guillen Vargas, Michael Neimer*
 ; Date Created: 2/4/2017
 ; Last Modified: 2/4/2017
 ; Brief description of the program
@@ -48,7 +48,44 @@ Start
  ; TExaS_Init sets bus clock at 80 MHz
       BL  TExaS_Init ; voltmeter, scope on PD3
       CPSIE  I    ; TExaS voltmeter, scope runs on interrupts
+	     
+;Initializing Port F;
+	LDR R1, =SYSCTL_RCGCGPIO_R      ; 1) activate clock for Port F
+	LDR R0, [R1]                 
+    ORR R0, R0, #0x20               ; set bit 5 to turn on clock
+    STR R0, [R1]                  
+    NOP
+    NOP                             ; allow time for clock to finish      
+    LDR R1, =GPIO_PORTF_DIR_R       ; 5) set direction register
+    MOV R0,#0x10                    ; PF4 is input
+    STR R0, [R1]                    
+    LDR R1, =GPIO_PORTF_AFSEL_R     ; 6) regular port function
+    MOV R0, #0                      ; 0 means disable alternate function 
+    STR R0, [R1]                    
+    LDR R1, =GPIO_PORTF_PUR_R       ; pull-up resistors for PF4,PF0
+    MOV R0, #0x10                   ; enable weak pull-up on PF0 and PF4
+    STR R0, [R1]              
+    LDR R1, =GPIO_PORTF_DEN_R       ; 7) enable Port F digital port
+    MOV R0, #0xFF                   ; 1 means enable digital I/O
+    STR R0, [R1]              
 
+;Initializing Port E
+	LDR R0, [R1]                 
+    ORR R0, R0, #0x20               ; set bit 5 to turn on clock
+    STR R0, [R1]                  
+    NOP
+    NOP                             ; allow time for clock to finish                 
+    LDR R1, =GPIO_PORTE_DIR_R       ; 5) set direction register
+    MOV R0,#0x01                    ; PF4 is input
+    STR R0, [R1]                    
+    LDR R1, =GPIO_PORTE_AFSEL_R     ; 6) regular port function
+    MOV R0, #0                      ; 0 means disable alternate function 
+    STR R0, [R1]                                  
+    LDR R1, =GPIO_PORTE_DEN_R       ; 7) enable Port F digital port
+    MOV R0, #0xFF                   ; 1 means enable digital I/O
+    STR R0, [R1]              
+	
+	
 loop  
 
 	  B    loop
