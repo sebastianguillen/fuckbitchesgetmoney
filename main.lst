@@ -98,108 +98,123 @@ ARM Macro Assembler    Page 2
    44 00000000 400FE608 
                        SYSCTL_RCGCGPIO_R
                                EQU              0x400FE608
-   45 00000000                 IMPORT           TExaS_Init
-   46 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+   45 00000000         
+   46 00000000                 IMPORT           TExaS_Init
+   47 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
 2
-   47 00000000                 THUMB
-   48 00000000                 EXPORT           Start
-   49 00000000         Start
-   50 00000000         ; TExaS_Init sets bus clock at 80 MHz
-   51 00000000 F7FF FFFE       BL               TExaS_Init  ; voltmeter, scope 
+   48 00000000                 THUMB
+   49 00000000                 EXPORT           Start
+   50 00000000         Start
+   51 00000000         ; TExaS_Init sets bus clock at 80 MHz
+   52 00000000 F7FF FFFE       BL               TExaS_Init  ; voltmeter, scope 
                                                             on PD3
-   52 00000004 B662            CPSIE            I           ; TExaS voltmeter, 
+   53 00000004 B662            CPSIE            I           ; TExaS voltmeter, 
                                                             scope runs on inter
                                                             rupts
-   53 00000006         
-   54 00000006         ;Initializing Port F;
-   55 00000006 491A            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
+   54 00000006         
+   55 00000006         ;Initializing Port F;
+   56 00000006 491A            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
                                                             ivate clock for Por
                                                             t F
-   56 00000008 6808            LDR              R0, [R1]
-   57 0000000A F040 0030       ORR              R0, R0, #0x30 ; set bit 5 to tu
+   57 00000008 6808            LDR              R0, [R1]
+   58 0000000A F040 0030       ORR              R0, R0, #0x30 ; set bit 5 to tu
                                                             rn on clock
-   58 0000000E 6008            STR              R0, [R1]
-   59 00000010 BF00            NOP
-   60 00000012 BF00            NOP                          ; allow time for cl
+   59 0000000E 6008            STR              R0, [R1]
+   60 00000010 BF00            NOP
+   61 00000012 BF00            NOP                          ; allow time for cl
                                                             ock to finish      
                                                             
-   61 00000014 4917            LDR              R1, =GPIO_PORTF_DIR_R ; 5) set 
+   62 00000014 4917            LDR              R1, =GPIO_PORTF_DIR_R ; 5) set 
                                                             direction register
-   62 00000016 F04F 0010       MOV              R0,#0x10    ; PF4 is input
-   63 0000001A 6008            STR              R0, [R1]
-   64 0000001C 4916            LDR              R1, =GPIO_PORTF_AFSEL_R ; 6) re
+   63 00000016 F04F 0010       MOV              R0,#0x10    ; PF4 is input
+   64 0000001A 6008            STR              R0, [R1]
 
 
 
 ARM Macro Assembler    Page 3 
 
 
+   65 0000001C 4916            LDR              R1, =GPIO_PORTF_AFSEL_R ; 6) re
                                                             gular port function
                                                             
-   65 0000001E F04F 0000       MOV              R0, #0      ; 0 means disable a
+   66 0000001E F04F 0000       MOV              R0, #0      ; 0 means disable a
                                                             lternate function 
-   66 00000022 6008            STR              R0, [R1]
-   67 00000024 4915            LDR              R1, =GPIO_PORTF_PUR_R ; pull-up
+   67 00000022 6008            STR              R0, [R1]
+   68 00000024 4915            LDR              R1, =GPIO_PORTF_PUR_R ; pull-up
                                                              resistors for PF4,
                                                             PF0
-   68 00000026 F04F 0010       MOV              R0, #0x10   ; enable weak pull-
+   69 00000026 F04F 0010       MOV              R0, #0x10   ; enable weak pull-
                                                             up on PF0 and PF4
-   69 0000002A 6008            STR              R0, [R1]
-   70 0000002C 4914            LDR              R1, =GPIO_PORTF_DEN_R ; 7) enab
+   70 0000002A 6008            STR              R0, [R1]
+   71 0000002C 4914            LDR              R1, =GPIO_PORTF_DEN_R ; 7) enab
                                                             le Port F digital p
                                                             ort
-   71 0000002E F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
+   72 0000002E F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
                                                             gital I/O
-   72 00000032 6008            STR              R0, [R1]
-   73 00000034         
-   74 00000034         ;Initializing Port E               
-   75 00000034 4913            LDR              R1, =GPIO_PORTE_DIR_R ; 5) set 
+   73 00000032 6008            STR              R0, [R1]
+   74 00000034         
+   75 00000034         ;Initializing Port E               
+   76 00000034 4913            LDR              R1, =GPIO_PORTE_DIR_R ; 5) set 
                                                             direction register
-   76 00000036 F04F 0001       MOV              R0,#0x01    ; PF4 is input
-   77 0000003A 6008            STR              R0, [R1]
-   78 0000003C 4912            LDR              R1, =GPIO_PORTE_AFSEL_R ; 6) re
+   77 00000036 F04F 0001       MOV              R0,#0x01    ; PF4 is input
+   78 0000003A 6008            STR              R0, [R1]
+   79 0000003C 4912            LDR              R1, =GPIO_PORTE_AFSEL_R ; 6) re
                                                             gular port function
                                                             
-   79 0000003E F04F 0000       MOV              R0, #0      ; 0 means disable a
+   80 0000003E F04F 0000       MOV              R0, #0      ; 0 means disable a
                                                             lternate function 
-   80 00000042 6008            STR              R0, [R1]
-   81 00000044 4911            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
+   81 00000042 6008            STR              R0, [R1]
+   82 00000044 4911            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
                                                             le Port F digital p
                                                             ort
-   82 00000046 F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
+   83 00000046 F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
                                                             gital I/O
-   83 0000004A 6008            STR              R0, [R1]
-   84 0000004C         
-   85 0000004C         loop
-   86 0000004C         
-   87 0000004C 4910    Twenty  LDR              R1, =GPIO_PORTE_DATA_R
-   88 0000004E 4811            LDR              R0, =TwentyOn
-   89 00000050 1E40    WtTwOn  SUBS             R0, R0, #1
-   90 00000052 D1FD            BNE              WtTwOn
-   91 00000054 6808            LDR              R0, [R1]
-   92 00000056 F080 0001       EOR              R0, #0x01
-   93 0000005A 6008            STR              R0, [R1]
-   94 0000005C 480E            LDR              R0, =TwentyOff
-   95 0000005E 1E40    WtTwOff SUBS             R0, R0, #1
-   96 00000060 D1FD            BNE              WtTwOff
-   97 00000062 6808            LDR              R0, [R1]
-   98 00000064 F080 0001       EOR              R0, #0x01
-   99 00000068 6008            STR              R0, [R1]
-  100 0000006A E7EF            B                Twenty
-  101 0000006C         
-  102 0000006C         
-  103 0000006C E7EE            B                loop
-  104 0000006E         
-  105 0000006E 00 00           ALIGN                        ; make sure the end
-                                                             of this section is
-                                                             aligned
+   84 0000004A 6008            STR              R0, [R1]
+   85 0000004C         
+   86 0000004C         loop
+   87 0000004C         
+   88 0000004C 4910    Twenty  LDR              R1, =GPIO_PORTE_DATA_R ; Loadin
+                                                            g data from Port E 
+                                                            into register
+   89 0000004E 4811            LDR              R0, =TwentyOn ; Loading data fr
+                                                            om LED into registe
+                                                            r
+   90 00000050 1E40    WtTwOn  SUBS             R0, R0, #1  ; Decrementing Coun
+                                                            ter
+   91 00000052 D1FD            BNE              WtTwOn      ; Counter, only bra
+                                                            nches when at 0
+   92 00000054 6808            LDR              R0, [R1]    ; Loading data from
+                                                             Port E into regist
+                                                            er
+   93 00000056 F080 0001       EOR              R0, #0x01   ; Toggling PE0
+   94 0000005A 6008            STR              R0, [R1]    ; Toggling PE0
+   95 0000005C 480E            LDR              R0, =TwentyOff ; Loading data f
+                                                            rom LED into regist
+                                                            er
+   96 0000005E 1E40    WtTwOff SUBS             R0, R0, #1  ; Decrementing Coun
+                                                            ter
 
 
 
 ARM Macro Assembler    Page 4 
 
 
-  106 00000070                 END                          ; end of file
+   97 00000060 D1FD            BNE              WtTwOff     ; Counter, only bra
+                                                            nches when at 0
+   98 00000062 6808            LDR              R0, [R1]    ; Loading data from
+                                                             Port E into regist
+                                                            er
+   99 00000064 F080 0001       EOR              R0, #0x01   ; Toggling PE0
+  100 00000068 6008            STR              R0, [R1]    ; Toggling PE0
+  101 0000006A E7EF            B                Twenty      ; Loop back up
+  102 0000006C         
+  103 0000006C         
+  104 0000006C E7EE            B                loop
+  105 0000006E         
+  106 0000006E 00 00           ALIGN                        ; make sure the end
+                                                             of this section is
+                                                             aligned
+  107 00000070                 END                          ; end of file
               400FE608 
               40025400 
               40025420 
@@ -224,7 +239,7 @@ Relocatable symbols
 
 Symbol: .text
    Definitions
-      At line 46 in file main.s
+      At line 47 in file main.s
    Uses
       None
 Comment: .text unused
@@ -232,41 +247,41 @@ Start 00000000
 
 Symbol: Start
    Definitions
-      At line 49 in file main.s
+      At line 50 in file main.s
    Uses
-      At line 48 in file main.s
+      At line 49 in file main.s
 Comment: Start used once
 Twenty 0000004C
 
 Symbol: Twenty
    Definitions
-      At line 87 in file main.s
+      At line 88 in file main.s
    Uses
-      At line 100 in file main.s
+      At line 101 in file main.s
 Comment: Twenty used once
 WtTwOff 0000005E
 
 Symbol: WtTwOff
    Definitions
-      At line 95 in file main.s
-   Uses
       At line 96 in file main.s
+   Uses
+      At line 97 in file main.s
 Comment: WtTwOff used once
 WtTwOn 00000050
 
 Symbol: WtTwOn
    Definitions
-      At line 89 in file main.s
-   Uses
       At line 90 in file main.s
+   Uses
+      At line 91 in file main.s
 Comment: WtTwOn used once
 loop 0000004C
 
 Symbol: loop
    Definitions
-      At line 85 in file main.s
+      At line 86 in file main.s
    Uses
-      At line 103 in file main.s
+      At line 104 in file main.s
 Comment: loop used once
 6 symbols
 
@@ -281,7 +296,7 @@ Symbol: GPIO_PORTE_AFSEL_R
    Definitions
       At line 33 in file main.s
    Uses
-      At line 78 in file main.s
+      At line 79 in file main.s
 Comment: GPIO_PORTE_AFSEL_R used once
 GPIO_PORTE_DATA_R 400243FC
 
@@ -289,7 +304,7 @@ Symbol: GPIO_PORTE_DATA_R
    Definitions
       At line 31 in file main.s
    Uses
-      At line 87 in file main.s
+      At line 88 in file main.s
 Comment: GPIO_PORTE_DATA_R used once
 GPIO_PORTE_DEN_R 4002451C
 
@@ -297,7 +312,7 @@ Symbol: GPIO_PORTE_DEN_R
    Definitions
       At line 34 in file main.s
    Uses
-      At line 81 in file main.s
+      At line 82 in file main.s
 Comment: GPIO_PORTE_DEN_R used once
 GPIO_PORTE_DIR_R 40024400
 
@@ -305,7 +320,7 @@ Symbol: GPIO_PORTE_DIR_R
    Definitions
       At line 32 in file main.s
    Uses
-      At line 75 in file main.s
+      At line 76 in file main.s
 Comment: GPIO_PORTE_DIR_R used once
 GPIO_PORTF_AFSEL_R 40025420
 
@@ -313,7 +328,7 @@ Symbol: GPIO_PORTF_AFSEL_R
    Definitions
       At line 38 in file main.s
    Uses
-      At line 64 in file main.s
+      At line 65 in file main.s
 Comment: GPIO_PORTF_AFSEL_R used once
 GPIO_PORTF_DATA_R 400253FC
 
@@ -329,7 +344,7 @@ Symbol: GPIO_PORTF_DEN_R
    Definitions
       At line 40 in file main.s
    Uses
-      At line 70 in file main.s
+      At line 71 in file main.s
 Comment: GPIO_PORTF_DEN_R used once
 GPIO_PORTF_DIR_R 40025400
 
@@ -343,7 +358,7 @@ Absolute symbols
    Definitions
       At line 37 in file main.s
    Uses
-      At line 61 in file main.s
+      At line 62 in file main.s
 Comment: GPIO_PORTF_DIR_R used once
 GPIO_PORTF_PUR_R 40025510
 
@@ -351,7 +366,7 @@ Symbol: GPIO_PORTF_PUR_R
    Definitions
       At line 39 in file main.s
    Uses
-      At line 67 in file main.s
+      At line 68 in file main.s
 Comment: GPIO_PORTF_PUR_R used once
 SYSCTL_RCGCGPIO_R 400FE608
 
@@ -359,7 +374,7 @@ Symbol: SYSCTL_RCGCGPIO_R
    Definitions
       At line 44 in file main.s
    Uses
-      At line 55 in file main.s
+      At line 56 in file main.s
 Comment: SYSCTL_RCGCGPIO_R used once
 TwentyOff 0007A120
 
@@ -367,7 +382,7 @@ Symbol: TwentyOff
    Definitions
       At line 43 in file main.s
    Uses
-      At line 94 in file main.s
+      At line 95 in file main.s
 Comment: TwentyOff used once
 TwentyOn 001E8480
 
@@ -375,7 +390,7 @@ Symbol: TwentyOn
    Definitions
       At line 42 in file main.s
    Uses
-      At line 88 in file main.s
+      At line 89 in file main.s
 Comment: TwentyOn used once
 12 symbols
 
@@ -388,9 +403,9 @@ TExaS_Init 00000000
 
 Symbol: TExaS_Init
    Definitions
-      At line 45 in file main.s
+      At line 46 in file main.s
    Uses
-      At line 51 in file main.s
+      At line 52 in file main.s
 Comment: TExaS_Init used once
 1 symbol
 352 symbols in table

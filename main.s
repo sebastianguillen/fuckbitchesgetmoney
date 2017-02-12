@@ -42,6 +42,7 @@ GPIO_PORTF_DEN_R   EQU 0x4002551C
 TwentyOn 		   EQU 0x001E8480
 TwentyOff		   EQU 0x0007A120
 SYSCTL_RCGCGPIO_R  EQU 0x400FE608
+	
        IMPORT  TExaS_Init
        AREA    |.text|, CODE, READONLY, ALIGN=2
        THUMB
@@ -84,20 +85,20 @@ Start
 
 loop  	
 
-Twenty  LDR R1, =GPIO_PORTE_DATA_R
-		LDR R0, =TwentyOn
-WtTwOn	SUBS R0, R0, #1
-	    BNE WtTwOn
-		LDR R0, [R1]
-		EOR R0, #0x01
-		STR R0, [R1]
-		LDR R0, =TwentyOff
-WtTwOff	SUBS R0, R0, #1
-		BNE	WtTwOff
-		LDR R0, [R1]
-		EOR R0, #0x01
-		STR R0, [R1]
-		B	Twenty
+Twenty  LDR R1, =GPIO_PORTE_DATA_R		; Loading data from Port E into register
+		LDR R0, =TwentyOn				; Loading data from LED into register
+WtTwOn	SUBS R0, R0, #1					; Decrementing Counter
+	    BNE WtTwOn						; Counter, only branches when at 0
+		LDR R0, [R1]					; Loading data from Port E into register
+		EOR R0, #0x01					; Toggling PE0
+		STR R0, [R1]					; Toggling PE0
+		LDR R0, =TwentyOff				; Loading data from LED into register
+WtTwOff	SUBS R0, R0, #1					; Decrementing Counter
+		BNE	WtTwOff						; Counter, only branches when at 0
+		LDR R0, [R1]					; Loading data from Port E into register
+		EOR R0, #0x01					; Toggling PE0
+		STR R0, [R1]					; Toggling PE0
+		B	Twenty						; Loop back up
 		
 		
 	B    loop
