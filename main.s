@@ -39,6 +39,8 @@ GPIO_PORTF_AFSEL_R EQU 0x40025420
 GPIO_PORTF_PUR_R   EQU 0x40025510
 GPIO_PORTF_DEN_R   EQU 0x4002551C
 
+TwentyOn 		   EQU 0x001E8480
+TwentyOff		   EQU 0x0007A120
 SYSCTL_RCGCGPIO_R  EQU 0x400FE608
        IMPORT  TExaS_Init
        AREA    |.text|, CODE, READONLY, ALIGN=2
@@ -52,7 +54,7 @@ Start
 ;Initializing Port F;
 	LDR R1, =SYSCTL_RCGCGPIO_R      ; 1) activate clock for Port F
 	LDR R0, [R1]                 
-    ORR R0, R0, #0x20               ; set bit 5 to turn on clock
+    ORR R0, R0, #0x30               ; set bit 5 to turn on clock
     STR R0, [R1]                  
     NOP
     NOP                             ; allow time for clock to finish      
@@ -69,12 +71,7 @@ Start
     MOV R0, #0xFF                   ; 1 means enable digital I/O
     STR R0, [R1]              
 
-;Initializing Port E
-	LDR R0, [R1]                 
-    ORR R0, R0, #0x20               ; set bit 5 to turn on clock
-    STR R0, [R1]                  
-    NOP
-    NOP                             ; allow time for clock to finish                 
+;Initializing Port E               
     LDR R1, =GPIO_PORTE_DIR_R       ; 5) set direction register
     MOV R0,#0x01                    ; PF4 is input
     STR R0, [R1]                    
@@ -84,11 +81,26 @@ Start
     LDR R1, =GPIO_PORTE_DEN_R       ; 7) enable Port F digital port
     MOV R0, #0xFF                   ; 1 means enable digital I/O
     STR R0, [R1]              
-	
-	
-loop  
 
-	  B    loop
+loop  	
+
+Twenty  LDR R1, =GPIO_PORTE_DATA_R
+		LDR R0, =TwentyOn
+WtTwOn	SUBS R0, R0, #1
+	    BNE WtTwOn
+		LDR R0, [R1]
+		EOR R0, #0x01
+		STR R0, [R1]
+		LDR R0, =TwentyOff
+WtTwOff	SUBS R0, R0, #1
+		BNE	WtTwOff
+		LDR R0, [R1]
+		EOR R0, #0x01
+		STR R0, [R1]
+		B	Twenty
+		
+		
+	B    loop
 
       ALIGN      ; make sure the end of this section is aligned
       END        ; end of file
