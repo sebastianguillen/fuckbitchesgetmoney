@@ -41,6 +41,12 @@ GPIO_PORTF_DEN_R   EQU 0x4002551C
 
 TwentyOn 		   EQU 0x001E8480
 TwentyOff		   EQU 0x0007A120
+FortyOn			   EQU 0x0016E360
+FortyOff           EQU 0x000F4240	
+SixtyOn			   EQU 0x000F4240	
+SixtyOff           EQU 0x0016E360
+EightyOn           EQU 0x0007A120 
+EightyOff		   EQU 0x001E8480	
 SYSCTL_RCGCGPIO_R  EQU 0x400FE608
 	
        IMPORT  TExaS_Init
@@ -83,25 +89,131 @@ Start
     MOV R0, #0xFF                   ; 1 means enable digital I/O
     STR R0, [R1]              
 
-loop  	
+loop  
 
-Twenty  LDR R1, =GPIO_PORTE_DATA_R		; Loading data from Port E into register
-		LDR R0, =TwentyOn				; Loading data from LED into register
-WtTwOn	SUBS R0, R0, #1					; Decrementing Counter
-	    BNE WtTwOn						; Counter, only branches when at 0
-		LDR R0, [R1]					; Loading data from Port E into register
-		EOR R0, #0x01					; Toggling PE0
-		STR R0, [R1]					; Toggling PE0
-		LDR R0, =TwentyOff				; Loading data from LED into register
-WtTwOff	SUBS R0, R0, #1					; Decrementing Counter
-		BNE	WtTwOff						; Counter, only branches when at 0
-		LDR R0, [R1]					; Loading data from Port E into register
-		EOR R0, #0x01					; Toggling PE0
-		STR R0, [R1]					; Toggling PE0
-		B	Twenty						; Loop back up
-		
-		
+Default20	
+	AND R2, R2, #0
+	LDR R1, =GPIO_PORTE_DATA_R
+	LDR R0, [R1] 						;Loading input from Port E	
+	AND R0, R0, #0x02					;Bitmasking
+	CMP R0, #2							; Checking to see if PE1 is pressed	
+	BNE skip20
+	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
+	
+skip20	
+	LDR R0, =TwentyOn					;R0 will serve as the constant for the On time period
+	LDR R3, =TwentyOff					;R3 will serve as the constant for the Off time period
+	CMP R2, #2                         
+	BEQ next40							; If it is pressed, then it does to 40%
+	BL dutyloop 						; If not than the 20% duty cycle is called
+	B Default20 							; If PE1 hasn't been pressed at all, then 20% continues
+	
+next40 
+	AND R2, R2, #0
+	LDR R1, =GPIO_PORTE_DATA_R
+	LDR R0, [R1] 						;Loading input from Port E	
+	AND R0, R0, #0x02					;Bitmasking
+	CMP R0, #2							; Checking to see if PE1 is pressed	
+	BNE skip40
+	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
+skip40	
+	LDR R0, =FortyOn
+	LDR R3, =FortyOff
+	CMP R2, #2							
+	BEQ next60							; If pressed, 60% is called
+	BL dutyloop							; 40% is called
+	B next40							; If PE1 hasn't been pressed at all, then 40% continues
+	
+next60
+	AND R2, R2, #0
+	LDR R1, =GPIO_PORTE_DATA_R
+	LDR R0, [R1] 						;Loading input from Port E	
+	AND R0, R0, #0x02					;Bitmasking
+	CMP R0, #2							; Checking to see if PE1 is pressed	
+	BNE skip60
+	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
+skip60	
+	LDR R0, =SixtyOn
+	LDR R3, =SixtyOff
+	CMP R2, #2							
+	BEQ next80							; If pressed, 80% is called
+	BL dutyloop							; 60% is called
+	B next60							; 60% continues
+	
+next80
+	AND R2, R2, #0
+	LDR R1, =GPIO_PORTE_DATA_R
+	LDR R0, [R1] 						;Loading input from Port E	
+	AND R0, R0, #0x02					;Bitmasking
+	CMP R0, #2							; Checking to see if PE1 is pressed	
+	BNE skip80
+	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
+skip80	
+	LDR R0, =EightyOn
+	LDR R3, =EightyOff
+	CMP R2, #2							
+	BEQ next100							; If pressed, 100% is called
+	BL dutyloop							; 80% is called
+	B next80							; 80% continues
+	
+next100
+	AND R2, R2, #0
+	LDR R1, =GPIO_PORTE_DATA_R
+	LDR R0, [R1] 						;Loading input from Port E	
+	AND R0, R0, #0x02					;Bitmasking
+	CMP R0, #2							; Checking to see if PE1 is pressed	
+	BNE skip100
+	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
+skip100	
+	CMP R2, #2
+	BEQ next0
+	MOV R0, #0x01
+	STR R0, [R1]
+	B next100
+
+next0
+	AND R2, R2, #0
+	LDR R1, =GPIO_PORTE_DATA_R
+	LDR R0, [R1] 						;Loading input from Port E	
+	AND R0, R0, #0x02					;Bitmasking
+	CMP R0, #2							; Checking to see if PE1 is pressed	
+	BNE skip0
+	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
+skip0	
+	CMP R2, #2
+	BEQ Default20
+	MOV R0, #0x00
+	STR R0, [R1]
+	B next0
+	
+
 	B    loop
+	
+dutyloop
+
+LoopOn  SUBS R0, R0, #1					; Decrementing Counter
+	    BNE LoopOn						; Counter, only branches when at 0
+		LDR R0, [R1]					; Loading data from Port E into register
+		EOR R0, #0x01					; Toggling PE0
+		STR R0, [R1]					; Toggling PE0
+		
+LoopOff	SUBS R3, R3, #1					; Decrementing Counter
+		BNE	LoopOff						; Counter, only branches when at 0
+		LDR R0, [R1]					; Loading data from Port E into register
+		EOR R0, #0x01					; Toggling PE0
+		STR R0, [R1]					; Toggling PE0
+		BX LR						    ; Loop back up
+		
+Poll
+		LDR R2, [R1] 						;Loading input from Port E	
+		AND R2, R2, #0x02					;Bitmasking
+		EOR R2, R0, R2						; Checking to see if PE1 is released
+		CMP R2, #2
+		BNE Poll
+		BX LR
+		
+		
+			
 
       ALIGN      ; make sure the end of this section is aligned
       END        ; end of file
