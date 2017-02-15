@@ -38,7 +38,7 @@ GPIO_PORTF_DIR_R   EQU 0x40025400
 GPIO_PORTF_AFSEL_R EQU 0x40025420
 GPIO_PORTF_PUR_R   EQU 0x40025510
 GPIO_PORTF_DEN_R   EQU 0x4002551C
-
+;Constants for 8Hz frequency. Format:Percentage On Off 
 TwentyOn 		   EQU 0x001E8480
 TwentyOff		   EQU 0x0007A120
 FortyOn			   EQU 0x0016E360
@@ -46,7 +46,19 @@ FortyOff           EQU 0x000F4240
 SixtyOn			   EQU 0x000F4240	
 SixtyOff           EQU 0x0016E360
 EightyOn           EQU 0x0007A120 
-EightyOff		   EQU 0x001E8480	
+EightyOff		   EQU 0x001E8480
+;Constants for 80Hz frequency. Same format
+BrthOn			   EQU 0x0003D090
+BrthOff			   EQU 0x0003D090	
+Brth2On            EQU 0x00030D40	
+Brth2Off           EQU 0x0000C350
+Brth4On			   EQU 0x000249F0
+Brth4Off           EQU 0x000186A0
+Brth6On            EQU 0x000186A0
+Brth6Off           EQU 0x000249F0
+Brth8On            EQU 0x0000C350
+Brth8Off           EQU 0x00030D40	
+	
 SYSCTL_RCGCGPIO_R  EQU 0x400FE608
 	
        IMPORT  TExaS_Init
@@ -61,12 +73,12 @@ Start
 ;Initializing Port F;
 	LDR R1, =SYSCTL_RCGCGPIO_R      ; 1) activate clock for Port F
 	LDR R0, [R1]                 
-    ORR R0, R0, #0x30               ; set bit 5 to turn on clock
+    ORR R0, R0, #0x20               ; set bit 5 to turn on clock
     STR R0, [R1]                  
     NOP
     NOP                             ; allow time for clock to finish      
     LDR R1, =GPIO_PORTF_DIR_R       ; 5) set direction register
-    MOV R0,#0x10                    ; PF4 is input
+    MOV R0,#0x00                    ; PF4 is input
     STR R0, [R1]                    
     LDR R1, =GPIO_PORTF_AFSEL_R     ; 6) regular port function
     MOV R0, #0                      ; 0 means disable alternate function 
@@ -79,8 +91,14 @@ Start
     STR R0, [R1]              
 
 ;Initializing Port E               
-    LDR R1, =GPIO_PORTE_DIR_R       ; 5) set direction register
-    MOV R0,#0x01                    ; PF4 is input
+    LDR R1, =SYSCTL_RCGCGPIO_R      ; 1) activate clock for Port F
+	LDR R0, [R1]                 
+    ORR R0, R0, #0x10               ; set bit 5 to turn on clock
+    STR R0, [R1]                  
+    NOP
+    NOP                             
+	LDR R1, =GPIO_PORTE_DIR_R       ; 5) set direction register
+    MOV R0,#0x01                    ; PE0 is output
     STR R0, [R1]                    
     LDR R1, =GPIO_PORTE_AFSEL_R     ; 6) regular port function
     MOV R0, #0                      ; 0 means disable alternate function 
@@ -89,10 +107,18 @@ Start
     MOV R0, #0xFF                   ; 1 means enable digital I/O
     STR R0, [R1]              
 
-loop  
+loop 
 
 Default20	
-	AND R2, R2, #0
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0							;Checking to see if PF4 is pressed
+	BNE Begin20							;If not, continue duty cycles
+	BL Breathe							;If so, LED breathes
+	B  BeginLEDoff						;When Breathing ends, LED goes Off
+	
+Begin20	
+	BIC R2, R2 							;R2 needs to be cleared since it is an indicator of when the button was pressed
 	LDR R1, =GPIO_PORTE_DATA_R
 	LDR R0, [R1] 						;Loading input from Port E	
 	AND R0, R0, #0x02					;Bitmasking
@@ -109,6 +135,13 @@ skip20
 	B Default20 							; If PE1 hasn't been pressed at all, then 20% continues
 	
 next40 
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0							;Checking to see if PF4 is pressed
+	BNE Begin40							;If not, continue duty cycles
+	BL Breathe							;If so, LED breathes
+	B  BeginLEDoff						;When Breathing ends, LED goes Off
+Begin40	
 	AND R2, R2, #0
 	LDR R1, =GPIO_PORTE_DATA_R
 	LDR R0, [R1] 						;Loading input from Port E	
@@ -125,6 +158,13 @@ skip40
 	B next40							; If PE1 hasn't been pressed at all, then 40% continues
 	
 next60
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0							;Checking to see if PF4 is pressed
+	BNE Begin60							;If not, continue duty cycles
+	BL Breathe							;If so, LED breathes
+	B  BeginLEDoff						;When Breathing ends, LED goes Off
+Begin60	
 	AND R2, R2, #0
 	LDR R1, =GPIO_PORTE_DATA_R
 	LDR R0, [R1] 						;Loading input from Port E	
@@ -141,6 +181,13 @@ skip60
 	B next60							; 60% continues
 	
 next80
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0							;Checking to see if PF4 is pressed
+	BNE Begin80							;If not, continue duty cycles
+	BL Breathe							;If so, LED breathes
+	B  BeginLEDoff						;When Breathing ends, LED goes Off
+Begin80	
 	AND R2, R2, #0
 	LDR R1, =GPIO_PORTE_DATA_R
 	LDR R0, [R1] 						;Loading input from Port E	
@@ -157,6 +204,13 @@ skip80
 	B next80							; 80% continues
 	
 next100
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0							;Checking to see if PF4 is pressed
+	BNE Begin100							;If not, continue duty cycles
+	BL Breathe							;If so, LED breathes
+	B  BeginLEDoff						;When Breathing ends, LED goes Off
+Begin100	
 	AND R2, R2, #0
 	LDR R1, =GPIO_PORTE_DATA_R
 	LDR R0, [R1] 						;Loading input from Port E	
@@ -166,12 +220,18 @@ next100
 	BL  Poll							; Poll to see if button is released, R2 returns 0x02 if pushed AND released
 skip100	
 	CMP R2, #2
-	BEQ next0
+	BEQ LEDoff
 	MOV R0, #0x01
 	STR R0, [R1]
 	B next100
 
-next0
+LEDoff
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0							;Checking to see if PF4 is pressed
+	BNE BeginLEDoff							;If not, continue duty cycles
+	BL Breathe							;If so, LED breathes					
+BeginLEDoff	
 	AND R2, R2, #0
 	LDR R1, =GPIO_PORTE_DATA_R
 	LDR R0, [R1] 						;Loading input from Port E	
@@ -184,7 +244,7 @@ skip0
 	BEQ Default20
 	MOV R0, #0x00
 	STR R0, [R1]
-	B next0
+	B LEDoff
 	
 
 	B    loop
@@ -193,14 +253,15 @@ dutyloop
 
 LoopOn  SUBS R0, R0, #1					; Decrementing Counter
 	    BNE LoopOn						; Counter, only branches when at 0
+		LDR R1, =GPIO_PORTE_DATA_R
 		LDR R0, [R1]					; Loading data from Port E into register
-		EOR R0, #0x01					; Toggling PE0
+		ORR R0, #0x01					; Toggling PE0
 		STR R0, [R1]					; Toggling PE0
 		
 LoopOff	SUBS R3, R3, #1					; Decrementing Counter
 		BNE	LoopOff						; Counter, only branches when at 0
 		LDR R0, [R1]					; Loading data from Port E into register
-		EOR R0, #0x01					; Toggling PE0
+		AND R0, #0x00					; Toggling PE0
 		STR R0, [R1]					; Toggling PE0
 		BX LR						    ; Loop back up
 		
@@ -212,6 +273,34 @@ Poll
 		BNE Poll
 		BX LR
 		
+Breathe    									;The Breathe function goes through the duty cycles without checking to see 
+	MOV R4, LR 								;if PE1 is pressed. R13 is pushed because the Breathe subroutine calls the
+Bloop										;dutyloop subroutine in order to have a delay, however new variable, 
+	LDR R0, =Brth2On						; Brth#On/Off accounts for a faster Hz in order to have breathing effect.
+	LDR R3, =Brth2Off
+	BL dutyloop
+	LDR R0, =Brth4On
+	LDR R3, =Brth4Off
+	BL dutyloop
+	LDR R0, =Brth6On
+	LDR R3, =Brth6Off
+	BL dutyloop
+	LDR R0, =Brth8On
+	LDR R3, =Brth8Off
+	BL dutyloop
+	LDR R0, =BrthOn
+	MOV R3, #0x01
+	BL dutyloop
+	MOV R0, #0x01
+	LDR R3, =BrthOff
+	LDR R1, =GPIO_PORTF_DATA_R
+	LDR R0, [R1]
+	CMP R0, #0
+	BNE Leave
+	B	Bloop 							;Bloop serves to not Push R13 every time
+Leave
+	MOV LR, R4
+	BX LR
 		
 			
 

@@ -88,7 +88,7 @@ ARM Macro Assembler    Page 2
    40 00000000 4002551C 
                        GPIO_PORTF_DEN_R
                                EQU              0x4002551C
-   41 00000000         
+   41 00000000         ;Constants for 8Hz frequency. Format:Percentage On Off 
    42 00000000 001E8480 
                        TwentyOn
                                EQU              0x001E8480
@@ -111,291 +111,451 @@ ARM Macro Assembler    Page 2
    49 00000000 001E8480 
                        EightyOff
                                EQU              0x001E8480
-   50 00000000 400FE608 
-                       SYSCTL_RCGCGPIO_R
-                               EQU              0x400FE608
-   51 00000000         
-   52 00000000                 IMPORT           TExaS_Init
-   53 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
-2
-   54 00000000                 THUMB
-   55 00000000                 EXPORT           Start
-   56 00000000         Start
-   57 00000000         ; TExaS_Init sets bus clock at 80 MHz
-   58 00000000 F7FF FFFE       BL               TExaS_Init  ; voltmeter, scope 
-                                                            on PD3
-   59 00000004 B662            CPSIE            I           ; TExaS voltmeter, 
-                                                            scope runs on inter
-                                                            rupts
-   60 00000006         
+   50 00000000         ;Constants for 80Hz frequency. Same format
+   51 00000000 0003D090 
+                       BrthOn  EQU              0x0003D090
+   52 00000000 0003D090 
+                       BrthOff EQU              0x0003D090
+   53 00000000 00030D40 
+                       Brth2On EQU              0x00030D40
+   54 00000000 0000C350 
+                       Brth2Off
+                               EQU              0x0000C350
+   55 00000000 000249F0 
+                       Brth4On EQU              0x000249F0
+   56 00000000 000186A0 
+                       Brth4Off
+                               EQU              0x000186A0
+   57 00000000 000186A0 
+                       Brth6On EQU              0x000186A0
 
 
 
 ARM Macro Assembler    Page 3 
 
 
-   61 00000006         ;Initializing Port F;
-   62 00000006 494D            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
+   58 00000000 000249F0 
+                       Brth6Off
+                               EQU              0x000249F0
+   59 00000000 0000C350 
+                       Brth8On EQU              0x0000C350
+   60 00000000 00030D40 
+                       Brth8Off
+                               EQU              0x00030D40
+   61 00000000         
+   62 00000000 400FE608 
+                       SYSCTL_RCGCGPIO_R
+                               EQU              0x400FE608
+   63 00000000         
+   64 00000000                 IMPORT           TExaS_Init
+   65 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+   66 00000000                 THUMB
+   67 00000000                 EXPORT           Start
+   68 00000000         Start
+   69 00000000         ; TExaS_Init sets bus clock at 80 MHz
+   70 00000000 F7FF FFFE       BL               TExaS_Init  ; voltmeter, scope 
+                                                            on PD3
+   71 00000004 B662            CPSIE            I           ; TExaS voltmeter, 
+                                                            scope runs on inter
+                                                            rupts
+   72 00000006         
+   73 00000006         ;Initializing Port F;
+   74 00000006 4978            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
                                                             ivate clock for Por
                                                             t F
-   63 00000008 6808            LDR              R0, [R1]
-   64 0000000A F040 0030       ORR              R0, R0, #0x30 ; set bit 5 to tu
+   75 00000008 6808            LDR              R0, [R1]
+   76 0000000A F040 0020       ORR              R0, R0, #0x20 ; set bit 5 to tu
                                                             rn on clock
-   65 0000000E 6008            STR              R0, [R1]
-   66 00000010 BF00            NOP
-   67 00000012 BF00            NOP                          ; allow time for cl
+   77 0000000E 6008            STR              R0, [R1]
+   78 00000010 BF00            NOP
+   79 00000012 BF00            NOP                          ; allow time for cl
                                                             ock to finish      
                                                             
-   68 00000014 494A            LDR              R1, =GPIO_PORTF_DIR_R ; 5) set 
+   80 00000014 4975            LDR              R1, =GPIO_PORTF_DIR_R ; 5) set 
                                                             direction register
-   69 00000016 F04F 0010       MOV              R0,#0x10    ; PF4 is input
-   70 0000001A 6008            STR              R0, [R1]
-   71 0000001C 4949            LDR              R1, =GPIO_PORTF_AFSEL_R ; 6) re
+   81 00000016 F04F 0000       MOV              R0,#0x00    ; PF4 is input
+   82 0000001A 6008            STR              R0, [R1]
+   83 0000001C 4974            LDR              R1, =GPIO_PORTF_AFSEL_R ; 6) re
                                                             gular port function
                                                             
-   72 0000001E F04F 0000       MOV              R0, #0      ; 0 means disable a
+   84 0000001E F04F 0000       MOV              R0, #0      ; 0 means disable a
                                                             lternate function 
-   73 00000022 6008            STR              R0, [R1]
-   74 00000024 4948            LDR              R1, =GPIO_PORTF_PUR_R ; pull-up
+   85 00000022 6008            STR              R0, [R1]
+   86 00000024 4973            LDR              R1, =GPIO_PORTF_PUR_R ; pull-up
                                                              resistors for PF4,
                                                             PF0
-   75 00000026 F04F 0010       MOV              R0, #0x10   ; enable weak pull-
+   87 00000026 F04F 0010       MOV              R0, #0x10   ; enable weak pull-
                                                             up on PF0 and PF4
-   76 0000002A 6008            STR              R0, [R1]
-   77 0000002C 4947            LDR              R1, =GPIO_PORTF_DEN_R ; 7) enab
+   88 0000002A 6008            STR              R0, [R1]
+   89 0000002C 4972            LDR              R1, =GPIO_PORTF_DEN_R ; 7) enab
                                                             le Port F digital p
                                                             ort
-   78 0000002E F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
+   90 0000002E F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
                                                             gital I/O
-   79 00000032 6008            STR              R0, [R1]
-   80 00000034         
-   81 00000034         ;Initializing Port E               
-   82 00000034 4946            LDR              R1, =GPIO_PORTE_DIR_R ; 5) set 
-                                                            direction register
-   83 00000036 F04F 0001       MOV              R0,#0x01    ; PF4 is input
-   84 0000003A 6008            STR              R0, [R1]
-   85 0000003C 4945            LDR              R1, =GPIO_PORTE_AFSEL_R ; 6) re
-                                                            gular port function
-                                                            
-   86 0000003E F04F 0000       MOV              R0, #0      ; 0 means disable a
-                                                            lternate function 
-   87 00000042 6008            STR              R0, [R1]
-   88 00000044 4944            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
-                                                            le Port F digital p
-                                                            ort
-   89 00000046 F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
-                                                            gital I/O
-   90 0000004A 6008            STR              R0, [R1]
-   91 0000004C         
-   92 0000004C         loop
-   93 0000004C         
-   94 0000004C         Default20
-   95 0000004C 4943            LDR              R1, =GPIO_PORTE_DATA_R
-   96 0000004E 6808            LDR              R0, [R1]    ;Loading input from
-                                                             Port E 
 
 
 
 ARM Macro Assembler    Page 4 
 
 
-   97 00000050 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
-   98 00000054 2802            CMP              R0, #2      ; Checking to see i
-                                                            f PE1 is pressed 
-   99 00000056 D101            BNE              skip20
-  100 00000058 F000 F868       BL               Poll        ; Poll to see if bu
-                                                            tton is released, R
-                                                            2 returns 0x02 if p
-                                                            ushed AND released
-  101 0000005C         
-  102 0000005C         skip20
-  103 0000005C 4840            LDR              R0, =TwentyOn ;R0 will serve as
-                                                             the constant for t
-                                                            he On time period
-  104 0000005E 4B41            LDR              R3, =TwentyOff ;R3 will serve a
-                                                            s the constant for 
-                                                            the Off time period
+   91 00000032 6008            STR              R0, [R1]
+   92 00000034         
+   93 00000034         ;Initializing Port E               
+   94 00000034 496C            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
+                                                            ivate clock for Por
+                                                            t F
+   95 00000036 6808            LDR              R0, [R1]
+   96 00000038 F040 0010       ORR              R0, R0, #0x10 ; set bit 5 to tu
+                                                            rn on clock
+   97 0000003C 6008            STR              R0, [R1]
+   98 0000003E BF00            NOP
+   99 00000040 BF00            NOP
+  100 00000042 496E            LDR              R1, =GPIO_PORTE_DIR_R ; 5) set 
+                                                            direction register
+  101 00000044 F04F 0001       MOV              R0,#0x01    ; PE0 is output
+  102 00000048 6008            STR              R0, [R1]
+  103 0000004A 496D            LDR              R1, =GPIO_PORTE_AFSEL_R ; 6) re
+                                                            gular port function
                                                             
-  105 00000060 2A02            CMP              R2, #2
-  106 00000062 D002            BEQ              next40      ; If it is pressed,
-                                                             then it does to 40
-                                                            %
-  107 00000064 F000 F855       BL               dutyloop    ; If not than the 2
-                                                            0% duty cycle is ca
-                                                            lled
-  108 00000068 E7F0            B                Default20   ; If PE1 hasn't bee
-                                                            n pressed at all, t
-                                                            hen 20% continues
-  109 0000006A         
-  110 0000006A         next40
-  111 0000006A F002 0200       AND              R2, R2, #0
-  112 0000006E 493B            LDR              R1, =GPIO_PORTE_DATA_R
-  113 00000070 6808            LDR              R0, [R1]    ;Loading input from
+  104 0000004C F04F 0000       MOV              R0, #0      ; 0 means disable a
+                                                            lternate function 
+  105 00000050 6008            STR              R0, [R1]
+  106 00000052 496C            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
+                                                            le Port F digital p
+                                                            ort
+  107 00000054 F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
+                                                            gital I/O
+  108 00000058 6008            STR              R0, [R1]
+  109 0000005A         
+  110 0000005A         loop
+  111 0000005A         
+  112 0000005A         Default20
+  113 0000005A 496B            LDR              R1, =GPIO_PORTF_DATA_R
+  114 0000005C 6808            LDR              R0, [R1]
+  115 0000005E 2800            CMP              R0, #0      ;Checking to see if
+                                                             PF4 is pressed
+  116 00000060 D102            BNE              Begin20     ;If not, continue d
+                                                            uty cycles
+  117 00000062 F000 F89F       BL               Breathe     ;If so, LED breathe
+                                                            s
+  118 00000066 E075            B                BeginLEDoff ;When Breathing end
+                                                            s, LED goes Off
+  119 00000068         
+  120 00000068         Begin20
+  121 00000068 EA22 0202       BIC              R2, R2      ;R2 needs to be cle
+                                                            ared since it is an
+                                                             indicator of when 
+                                                            the button was pres
+                                                            sed
+  122 0000006C 4967            LDR              R1, =GPIO_PORTE_DATA_R
+  123 0000006E 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
-  114 00000072 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
-  115 00000076 2802            CMP              R0, #2      ; Checking to see i
+  124 00000070 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
+  125 00000074 2802            CMP              R0, #2      ; Checking to see i
                                                             f PE1 is pressed 
-  116 00000078 D101            BNE              skip40
-  117 0000007A F000 F857       BL               Poll        ; Poll to see if bu
+  126 00000076 D101            BNE              skip20
+  127 00000078 F000 F88C       BL               Poll        ; Poll to see if bu
                                                             tton is released, R
                                                             2 returns 0x02 if p
-                                                            ushed AND released
-  118 0000007E         skip40
-  119 0000007E 483A            LDR              R0, =FortyOn
-  120 00000080 4B3A            LDR              R3, =FortyOff
-  121 00000082 2A02            CMP              R2, #2
-  122 00000084 D002            BEQ              next60      ; If pressed, 60% i
-                                                            s called
-  123 00000086 F000 F844       BL               dutyloop    ; 40% is called
-  124 0000008A E7EE            B                next40      ; If PE1 hasn't bee
-                                                            n pressed at all, t
-                                                            hen 40% continues
-  125 0000008C         
-  126 0000008C         next60
-  127 0000008C F002 0200       AND              R2, R2, #0
-  128 00000090 4932            LDR              R1, =GPIO_PORTE_DATA_R
-  129 00000092 6808            LDR              R0, [R1]    ;Loading input from
-                                                             Port E 
-  130 00000094 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
-  131 00000098 2802            CMP              R0, #2      ; Checking to see i
 
 
 
 ARM Macro Assembler    Page 5 
 
 
+                                                            ushed AND released
+  128 0000007C         
+  129 0000007C         skip20
+  130 0000007C 4864            LDR              R0, =TwentyOn ;R0 will serve as
+                                                             the constant for t
+                                                            he On time period
+  131 0000007E 4B65            LDR              R3, =TwentyOff ;R3 will serve a
+                                                            s the constant for 
+                                                            the Off time period
+                                                            
+  132 00000080 2A02            CMP              R2, #2
+  133 00000082 D002            BEQ              next40      ; If it is pressed,
+                                                             then it does to 40
+                                                            %
+  134 00000084 F000 F878       BL               dutyloop    ; If not than the 2
+                                                            0% duty cycle is ca
+                                                            lled
+  135 00000088 E7E7            B                Default20   ; If PE1 hasn't bee
+                                                            n pressed at all, t
+                                                            hen 20% continues
+  136 0000008A         
+  137 0000008A         next40
+  138 0000008A 495F            LDR              R1, =GPIO_PORTF_DATA_R
+  139 0000008C 6808            LDR              R0, [R1]
+  140 0000008E 2800            CMP              R0, #0      ;Checking to see if
+                                                             PF4 is pressed
+  141 00000090 D102            BNE              Begin40     ;If not, continue d
+                                                            uty cycles
+  142 00000092 F000 F887       BL               Breathe     ;If so, LED breathe
+                                                            s
+  143 00000096 E05D            B                BeginLEDoff ;When Breathing end
+                                                            s, LED goes Off
+  144 00000098         Begin40
+  145 00000098 F002 0200       AND              R2, R2, #0
+  146 0000009C 495B            LDR              R1, =GPIO_PORTE_DATA_R
+  147 0000009E 6808            LDR              R0, [R1]    ;Loading input from
+                                                             Port E 
+  148 000000A0 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
+  149 000000A4 2802            CMP              R0, #2      ; Checking to see i
                                                             f PE1 is pressed 
-  132 0000009A D101            BNE              skip60
-  133 0000009C F000 F846       BL               Poll        ; Poll to see if bu
+  150 000000A6 D101            BNE              skip40
+  151 000000A8 F000 F874       BL               Poll        ; Poll to see if bu
                                                             tton is released, R
                                                             2 returns 0x02 if p
                                                             ushed AND released
-  134 000000A0         skip60
-  135 000000A0 4832            LDR              R0, =SixtyOn
-  136 000000A2 4B31            LDR              R3, =SixtyOff
-  137 000000A4 2A02            CMP              R2, #2
-  138 000000A6 D002            BEQ              next80      ; If pressed, 80% i
+  152 000000AC         skip40
+  153 000000AC 485A            LDR              R0, =FortyOn
+  154 000000AE 4B5B            LDR              R3, =FortyOff
+  155 000000B0 2A02            CMP              R2, #2
+  156 000000B2 D002            BEQ              next60      ; If pressed, 60% i
                                                             s called
-  139 000000A8 F000 F833       BL               dutyloop    ; 60% is called
-  140 000000AC E7EE            B                next60      ; 60% continues
-  141 000000AE         
-  142 000000AE         next80
-  143 000000AE F002 0200       AND              R2, R2, #0
-  144 000000B2 492A            LDR              R1, =GPIO_PORTE_DATA_R
-  145 000000B4 6808            LDR              R0, [R1]    ;Loading input from
-                                                             Port E 
-  146 000000B6 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
-  147 000000BA 2802            CMP              R0, #2      ; Checking to see i
-                                                            f PE1 is pressed 
-  148 000000BC D101            BNE              skip80
-  149 000000BE F000 F835       BL               Poll        ; Poll to see if bu
-                                                            tton is released, R
-                                                            2 returns 0x02 if p
-                                                            ushed AND released
-  150 000000C2         skip80
-  151 000000C2 4828            LDR              R0, =EightyOn
-  152 000000C4 4B26            LDR              R3, =EightyOff
-  153 000000C6 2A02            CMP              R2, #2
-  154 000000C8 D002            BEQ              next100     ; If pressed, 100% 
-                                                            is called
-  155 000000CA F000 F822       BL               dutyloop    ; 80% is called
-  156 000000CE E7EE            B                next80      ; 80% continues
-  157 000000D0         
-  158 000000D0         next100
-  159 000000D0 F002 0200       AND              R2, R2, #0
-  160 000000D4 4921            LDR              R1, =GPIO_PORTE_DATA_R
-  161 000000D6 6808            LDR              R0, [R1]    ;Loading input from
-                                                             Port E 
-  162 000000D8 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
-  163 000000DC 2802            CMP              R0, #2      ; Checking to see i
-                                                            f PE1 is pressed 
-  164 000000DE D101            BNE              skip100
-  165 000000E0 F000 F824       BL               Poll        ; Poll to see if bu
-                                                            tton is released, R
-                                                            2 returns 0x02 if p
-                                                            ushed AND released
-  166 000000E4         skip100
-  167 000000E4 2A02            CMP              R2, #2
-  168 000000E6 D003            BEQ              next0
-  169 000000E8 F04F 0001       MOV              R0, #0x01
-  170 000000EC 6008            STR              R0, [R1]
-  171 000000EE E7EF            B                next100
-  172 000000F0         
-  173 000000F0         next0
-  174 000000F0 F002 0200       AND              R2, R2, #0
+  157 000000B4 F000 F860       BL               dutyloop    ; 40% is called
+  158 000000B8 E7E7            B                next40      ; If PE1 hasn't bee
+                                                            n pressed at all, t
+                                                            hen 40% continues
+  159 000000BA         
+  160 000000BA         next60
+  161 000000BA 4953            LDR              R1, =GPIO_PORTF_DATA_R
+  162 000000BC 6808            LDR              R0, [R1]
 
 
 
 ARM Macro Assembler    Page 6 
 
 
-  175 000000F4 4919            LDR              R1, =GPIO_PORTE_DATA_R
-  176 000000F6 6808            LDR              R0, [R1]    ;Loading input from
+  163 000000BE 2800            CMP              R0, #0      ;Checking to see if
+                                                             PF4 is pressed
+  164 000000C0 D102            BNE              Begin60     ;If not, continue d
+                                                            uty cycles
+  165 000000C2 F000 F86F       BL               Breathe     ;If so, LED breathe
+                                                            s
+  166 000000C6 E045            B                BeginLEDoff ;When Breathing end
+                                                            s, LED goes Off
+  167 000000C8         Begin60
+  168 000000C8 F002 0200       AND              R2, R2, #0
+  169 000000CC 494F            LDR              R1, =GPIO_PORTE_DATA_R
+  170 000000CE 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
-  177 000000F8 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
-  178 000000FC 2802            CMP              R0, #2      ; Checking to see i
+  171 000000D0 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
+  172 000000D4 2802            CMP              R0, #2      ; Checking to see i
                                                             f PE1 is pressed 
-  179 000000FE D101            BNE              skip0
-  180 00000100 F000 F814       BL               Poll        ; Poll to see if bu
+  173 000000D6 D101            BNE              skip60
+  174 000000D8 F000 F85C       BL               Poll        ; Poll to see if bu
                                                             tton is released, R
                                                             2 returns 0x02 if p
                                                             ushed AND released
-  181 00000104         skip0
-  182 00000104 2A02            CMP              R2, #2
-  183 00000106 D0A1            BEQ              Default20
-  184 00000108 F04F 0000       MOV              R0, #0x00
-  185 0000010C 6008            STR              R0, [R1]
-  186 0000010E E7EF            B                next0
-  187 00000110         
-  188 00000110         
-  189 00000110 E79C            B                loop
-  190 00000112         
-  191 00000112         dutyloop
-  192 00000112         
-  193 00000112 1E40    LoopOn  SUBS             R0, R0, #1  ; Decrementing Coun
-                                                            ter
-  194 00000114 D1FD            BNE              LoopOn      ; Counter, only bra
-                                                            nches when at 0
-  195 00000116 6808            LDR              R0, [R1]    ; Loading data from
-                                                             Port E into regist
-                                                            er
-  196 00000118 F080 0001       EOR              R0, #0x01   ; Toggling PE0
-  197 0000011C 6008            STR              R0, [R1]    ; Toggling PE0
-  198 0000011E         
-  199 0000011E 1E5B    LoopOff SUBS             R3, R3, #1  ; Decrementing Coun
-                                                            ter
-  200 00000120 D1FD            BNE              LoopOff     ; Counter, only bra
-                                                            nches when at 0
-  201 00000122 6808            LDR              R0, [R1]    ; Loading data from
-                                                             Port E into regist
-                                                            er
-  202 00000124 F080 0001       EOR              R0, #0x01   ; Toggling PE0
-  203 00000128 6008            STR              R0, [R1]    ; Toggling PE0
-  204 0000012A 4770            BX               LR          ; Loop back up
-  205 0000012C         
-  206 0000012C         Poll
-  207 0000012C 680A            LDR              R2, [R1]    ;Loading input from
+  175 000000DC         skip60
+  176 000000DC 484F            LDR              R0, =SixtyOn
+  177 000000DE 4B4E            LDR              R3, =SixtyOff
+  178 000000E0 2A02            CMP              R2, #2
+  179 000000E2 D002            BEQ              next80      ; If pressed, 80% i
+                                                            s called
+  180 000000E4 F000 F848       BL               dutyloop    ; 60% is called
+  181 000000E8 E7E7            B                next60      ; 60% continues
+  182 000000EA         
+  183 000000EA         next80
+  184 000000EA 4947            LDR              R1, =GPIO_PORTF_DATA_R
+  185 000000EC 6808            LDR              R0, [R1]
+  186 000000EE 2800            CMP              R0, #0      ;Checking to see if
+                                                             PF4 is pressed
+  187 000000F0 D102            BNE              Begin80     ;If not, continue d
+                                                            uty cycles
+  188 000000F2 F000 F857       BL               Breathe     ;If so, LED breathe
+                                                            s
+  189 000000F6 E02D            B                BeginLEDoff ;When Breathing end
+                                                            s, LED goes Off
+  190 000000F8         Begin80
+  191 000000F8 F002 0200       AND              R2, R2, #0
+  192 000000FC 4943            LDR              R1, =GPIO_PORTE_DATA_R
+  193 000000FE 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
-  208 0000012E F002 0202       AND              R2, R2, #0x02 ;Bitmasking
-  209 00000132 EA80 0202       EOR              R2, R0, R2  ; Checking to see i
-                                                            f PE1 is released
-  210 00000136 2A02            CMP              R2, #2
-  211 00000138 D1F8            BNE              Poll
-  212 0000013A 4770            BX               LR
-  213 0000013C         
-  214 0000013C         
-  215 0000013C         
-  216 0000013C         
-  217 0000013C                 ALIGN                        ; make sure the end
-                                                             of this section is
+  194 00000100 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
+  195 00000104 2802            CMP              R0, #2      ; Checking to see i
+                                                            f PE1 is pressed 
+  196 00000106 D101            BNE              skip80
+  197 00000108 F000 F844       BL               Poll        ; Poll to see if bu
+                                                            tton is released, R
+                                                            2 returns 0x02 if p
+                                                            ushed AND released
+  198 0000010C         skip80
+  199 0000010C 4841            LDR              R0, =EightyOn
+  200 0000010E 4B40            LDR              R3, =EightyOff
+  201 00000110 2A02            CMP              R2, #2
+  202 00000112 D002            BEQ              next100     ; If pressed, 100% 
 
 
 
 ARM Macro Assembler    Page 7 
 
 
+                                                            is called
+  203 00000114 F000 F830       BL               dutyloop    ; 80% is called
+  204 00000118 E7E7            B                next80      ; 80% continues
+  205 0000011A         
+  206 0000011A         next100
+  207 0000011A 493B            LDR              R1, =GPIO_PORTF_DATA_R
+  208 0000011C 6808            LDR              R0, [R1]
+  209 0000011E 2800            CMP              R0, #0      ;Checking to see if
+                                                             PF4 is pressed
+  210 00000120 D102            BNE              Begin100    ;If not, continue d
+                                                            uty cycles
+  211 00000122 F000 F83F       BL               Breathe     ;If so, LED breathe
+                                                            s
+  212 00000126 E015            B                BeginLEDoff ;When Breathing end
+                                                            s, LED goes Off
+  213 00000128         Begin100
+  214 00000128 F002 0200       AND              R2, R2, #0
+  215 0000012C 4937            LDR              R1, =GPIO_PORTE_DATA_R
+  216 0000012E 6808            LDR              R0, [R1]    ;Loading input from
+                                                             Port E 
+  217 00000130 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
+  218 00000134 2802            CMP              R0, #2      ; Checking to see i
+                                                            f PE1 is pressed 
+  219 00000136 D101            BNE              skip100
+  220 00000138 F000 F82C       BL               Poll        ; Poll to see if bu
+                                                            tton is released, R
+                                                            2 returns 0x02 if p
+                                                            ushed AND released
+  221 0000013C         skip100
+  222 0000013C 2A02            CMP              R2, #2
+  223 0000013E D003            BEQ              LEDoff
+  224 00000140 F04F 0001       MOV              R0, #0x01
+  225 00000144 6008            STR              R0, [R1]
+  226 00000146 E7E8            B                next100
+  227 00000148         
+  228 00000148         LEDoff
+  229 00000148 492F            LDR              R1, =GPIO_PORTF_DATA_R
+  230 0000014A 6808            LDR              R0, [R1]
+  231 0000014C 2800            CMP              R0, #0      ;Checking to see if
+                                                             PF4 is pressed
+  232 0000014E D101            BNE              BeginLEDoff ;If not, continue d
+                                                            uty cycles
+  233 00000150 F000 F828       BL               Breathe     ;If so, LED breathe
+                                                            s     
+  234 00000154         BeginLEDoff
+  235 00000154 F002 0200       AND              R2, R2, #0
+  236 00000158 492C            LDR              R1, =GPIO_PORTE_DATA_R
+  237 0000015A 6808            LDR              R0, [R1]    ;Loading input from
+                                                             Port E 
+  238 0000015C F000 0002       AND              R0, R0, #0x02 ;Bitmasking
+  239 00000160 2802            CMP              R0, #2      ; Checking to see i
+                                                            f PE1 is pressed 
+  240 00000162 D101            BNE              skip0
+  241 00000164 F000 F816       BL               Poll        ; Poll to see if bu
+                                                            tton is released, R
+                                                            2 returns 0x02 if p
+                                                            ushed AND released
+  242 00000168         skip0
+  243 00000168 2A02            CMP              R2, #2
+
+
+
+ARM Macro Assembler    Page 8 
+
+
+  244 0000016A F43F AF76       BEQ              Default20
+  245 0000016E F04F 0000       MOV              R0, #0x00
+  246 00000172 6008            STR              R0, [R1]
+  247 00000174 E7E8            B                LEDoff
+  248 00000176         
+  249 00000176         
+  250 00000176 E770            B                loop
+  251 00000178         
+  252 00000178         dutyloop
+  253 00000178         
+  254 00000178 1E40    LoopOn  SUBS             R0, R0, #1  ; Decrementing Coun
+                                                            ter
+  255 0000017A D1FD            BNE              LoopOn      ; Counter, only bra
+                                                            nches when at 0
+  256 0000017C 4923            LDR              R1, =GPIO_PORTE_DATA_R
+  257 0000017E 6808            LDR              R0, [R1]    ; Loading data from
+                                                             Port E into regist
+                                                            er
+  258 00000180 F040 0001       ORR              R0, #0x01   ; Toggling PE0
+  259 00000184 6008            STR              R0, [R1]    ; Toggling PE0
+  260 00000186         
+  261 00000186 1E5B    LoopOff SUBS             R3, R3, #1  ; Decrementing Coun
+                                                            ter
+  262 00000188 D1FD            BNE              LoopOff     ; Counter, only bra
+                                                            nches when at 0
+  263 0000018A 6808            LDR              R0, [R1]    ; Loading data from
+                                                             Port E into regist
+                                                            er
+  264 0000018C F000 0000       AND              R0, #0x00   ; Toggling PE0
+  265 00000190 6008            STR              R0, [R1]    ; Toggling PE0
+  266 00000192 4770            BX               LR          ; Loop back up
+  267 00000194         
+  268 00000194         Poll
+  269 00000194 680A            LDR              R2, [R1]    ;Loading input from
+                                                             Port E 
+  270 00000196 F002 0202       AND              R2, R2, #0x02 ;Bitmasking
+  271 0000019A EA80 0202       EOR              R2, R0, R2  ; Checking to see i
+                                                            f PE1 is released
+  272 0000019E 2A02            CMP              R2, #2
+  273 000001A0 D1F8            BNE              Poll
+  274 000001A2 4770            BX               LR
+  275 000001A4         
+  276 000001A4         Breathe                              ;The Breathe functi
+                                                            on goes through the
+                                                             duty cycles withou
+                                                            t checking to see 
+  277 000001A4 4674            MOV              R4, LR      ;if PE1 is pressed.
+                                                             R13 is pushed beca
+                                                            use the Breathe sub
+                                                            routine calls the
+  278 000001A6         Bloop                                ;dutyloop subroutin
+                                                            e in order to have 
+                                                            a delay, however ne
+                                                            w variable, 
+  279 000001A6 481E            LDR              R0, =Brth2On ; Brth#On/Off acco
+                                                            unts for a faster H
+                                                            z in order to have 
+                                                            breathing effect.
+  280 000001A8 F24C 3350       LDR              R3, =Brth2Off
+
+
+
+ARM Macro Assembler    Page 9 
+
+
+  281 000001AC F7FF FFE4       BL               dutyloop
+  282 000001B0 481C            LDR              R0, =Brth4On
+  283 000001B2 4B1D            LDR              R3, =Brth4Off
+  284 000001B4 F7FF FFE0       BL               dutyloop
+  285 000001B8 481B            LDR              R0, =Brth6On
+  286 000001BA 4B1A            LDR              R3, =Brth6Off
+  287 000001BC F7FF FFDC       BL               dutyloop
+  288 000001C0 F24C 3050       LDR              R0, =Brth8On
+  289 000001C4 4B16            LDR              R3, =Brth8Off
+  290 000001C6 F7FF FFD7       BL               dutyloop
+  291 000001CA 4818            LDR              R0, =BrthOn
+  292 000001CC F04F 0301       MOV              R3, #0x01
+  293 000001D0 F7FF FFD2       BL               dutyloop
+  294 000001D4 F04F 0001       MOV              R0, #0x01
+  295 000001D8 4B14            LDR              R3, =BrthOff
+  296 000001DA 490B            LDR              R1, =GPIO_PORTF_DATA_R
+  297 000001DC 6808            LDR              R0, [R1]
+  298 000001DE 2800            CMP              R0, #0
+  299 000001E0 D100            BNE              Leave
+  300 000001E2 E7E0            B                Bloop       ;Bloop serves to no
+                                                            t Push R13 every ti
+                                                            me
+  301 000001E4         Leave
+  302 000001E4 46A6            MOV              LR, R4
+  303 000001E6 4770            BX               LR
+  304 000001E8         
+  305 000001E8         
+  306 000001E8         
+  307 000001E8                 ALIGN                        ; make sure the end
+                                                             of this section is
                                                              aligned
-  218 0000013C                 END                          ; end of file
+  308 000001E8                 END                          ; end of file
               400FE608 
               40025400 
               40025420 
@@ -404,11 +564,16 @@ ARM Macro Assembler    Page 7
               40024400 
               40024420 
               4002451C 
+              400253FC 
               400243FC 
               001E8480 
               0007A120 
               0016E360 
               000F4240 
+              00030D40 
+              000249F0 
+              000186A0 
+              0003D090 
 Command Line: --debug --xref --cpu=Cortex-M4 --apcs=interwork --depend=.\main.d
  -o.\main.o -IC:\Keil\ARM\RV31\INC -IC:\Keil\ARM\CMSIS\Include -IC:\Keil\ARM\In
 c\Luminary --predefine="__EVAL SETA 1" --list=.\main.lst main.s
@@ -422,195 +587,380 @@ Relocatable symbols
 
 Symbol: .text
    Definitions
-      At line 53 in file main.s
+      At line 65 in file main.s
    Uses
       None
 Comment: .text unused
-Default20 0000004C
+Begin100 00000128
 
-Symbol: Default20
+Symbol: Begin100
    Definitions
-      At line 94 in file main.s
+      At line 213 in file main.s
    Uses
-      At line 108 in file main.s
-      At line 183 in file main.s
+      At line 210 in file main.s
+Comment: Begin100 used once
+Begin20 00000068
 
-LoopOff 0000011E
-
-Symbol: LoopOff
+Symbol: Begin20
    Definitions
-      At line 199 in file main.s
+      At line 120 in file main.s
    Uses
-      At line 200 in file main.s
-Comment: LoopOff used once
-LoopOn 00000112
+      At line 116 in file main.s
+Comment: Begin20 used once
+Begin40 00000098
 
-Symbol: LoopOn
+Symbol: Begin40
    Definitions
-      At line 193 in file main.s
+      At line 144 in file main.s
    Uses
-      At line 194 in file main.s
-Comment: LoopOn used once
-Poll 0000012C
+      At line 141 in file main.s
+Comment: Begin40 used once
+Begin60 000000C8
 
-Symbol: Poll
+Symbol: Begin60
    Definitions
-      At line 206 in file main.s
+      At line 167 in file main.s
    Uses
-      At line 100 in file main.s
-      At line 117 in file main.s
-      At line 133 in file main.s
-      At line 149 in file main.s
-      At line 165 in file main.s
-      At line 180 in file main.s
-      At line 211 in file main.s
+      At line 164 in file main.s
+Comment: Begin60 used once
+Begin80 000000F8
 
-Start 00000000
-
-Symbol: Start
+Symbol: Begin80
    Definitions
-      At line 56 in file main.s
+      At line 190 in file main.s
    Uses
-      At line 55 in file main.s
-Comment: Start used once
-dutyloop 00000112
+      At line 187 in file main.s
+Comment: Begin80 used once
+BeginLEDoff 00000154
 
-Symbol: dutyloop
+Symbol: BeginLEDoff
    Definitions
+      At line 234 in file main.s
+   Uses
+      At line 118 in file main.s
+      At line 143 in file main.s
+      At line 166 in file main.s
+      At line 189 in file main.s
+      At line 212 in file main.s
 
 
 
 ARM Macro Assembler    Page 2 Alphabetic symbol ordering
 Relocatable symbols
 
-      At line 191 in file main.s
-   Uses
-      At line 107 in file main.s
-      At line 123 in file main.s
-      At line 139 in file main.s
-      At line 155 in file main.s
+      At line 232 in file main.s
 
-loop 0000004C
+Bloop 000001A6
 
-Symbol: loop
+Symbol: Bloop
    Definitions
-      At line 92 in file main.s
+      At line 278 in file main.s
    Uses
-      At line 189 in file main.s
-Comment: loop used once
-next0 000000F0
+      At line 300 in file main.s
+Comment: Bloop used once
+Breathe 000001A4
 
-Symbol: next0
+Symbol: Breathe
    Definitions
-      At line 173 in file main.s
+      At line 276 in file main.s
    Uses
-      At line 168 in file main.s
-      At line 186 in file main.s
-
-next100 000000D0
-
-Symbol: next100
-   Definitions
-      At line 158 in file main.s
-   Uses
-      At line 154 in file main.s
-      At line 171 in file main.s
-
-next40 0000006A
-
-Symbol: next40
-   Definitions
-      At line 110 in file main.s
-   Uses
-      At line 106 in file main.s
-      At line 124 in file main.s
-
-next60 0000008C
-
-Symbol: next60
-   Definitions
-      At line 126 in file main.s
-   Uses
-      At line 122 in file main.s
-      At line 140 in file main.s
-
-next80 000000AE
-
-Symbol: next80
-   Definitions
+      At line 117 in file main.s
       At line 142 in file main.s
+      At line 165 in file main.s
+      At line 188 in file main.s
+      At line 211 in file main.s
+      At line 233 in file main.s
+
+Default20 0000005A
+
+Symbol: Default20
+   Definitions
+      At line 112 in file main.s
    Uses
-      At line 138 in file main.s
-      At line 156 in file main.s
+      At line 135 in file main.s
+      At line 244 in file main.s
+
+LEDoff 00000148
+
+Symbol: LEDoff
+   Definitions
+      At line 228 in file main.s
+   Uses
+      At line 223 in file main.s
+      At line 247 in file main.s
+
+Leave 000001E4
+
+Symbol: Leave
+   Definitions
+      At line 301 in file main.s
+   Uses
+      At line 299 in file main.s
+Comment: Leave used once
+LoopOff 00000186
+
+Symbol: LoopOff
+   Definitions
+      At line 261 in file main.s
+   Uses
+      At line 262 in file main.s
+Comment: LoopOff used once
+LoopOn 00000178
+
 
 
 
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Relocatable symbols
 
+Symbol: LoopOn
+   Definitions
+      At line 254 in file main.s
+   Uses
+      At line 255 in file main.s
+Comment: LoopOn used once
+Poll 00000194
 
-skip0 00000104
+Symbol: Poll
+   Definitions
+      At line 268 in file main.s
+   Uses
+      At line 127 in file main.s
+      At line 151 in file main.s
+      At line 174 in file main.s
+      At line 197 in file main.s
+      At line 220 in file main.s
+      At line 241 in file main.s
+      At line 273 in file main.s
+
+Start 00000000
+
+Symbol: Start
+   Definitions
+      At line 68 in file main.s
+   Uses
+      At line 67 in file main.s
+Comment: Start used once
+dutyloop 00000178
+
+Symbol: dutyloop
+   Definitions
+      At line 252 in file main.s
+   Uses
+      At line 134 in file main.s
+      At line 157 in file main.s
+      At line 180 in file main.s
+      At line 203 in file main.s
+      At line 281 in file main.s
+      At line 284 in file main.s
+      At line 287 in file main.s
+      At line 290 in file main.s
+      At line 293 in file main.s
+
+loop 0000005A
+
+Symbol: loop
+   Definitions
+      At line 110 in file main.s
+   Uses
+      At line 250 in file main.s
+Comment: loop used once
+next100 0000011A
+
+Symbol: next100
+   Definitions
+      At line 206 in file main.s
+   Uses
+      At line 202 in file main.s
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 226 in file main.s
+
+next40 0000008A
+
+Symbol: next40
+   Definitions
+      At line 137 in file main.s
+   Uses
+      At line 133 in file main.s
+      At line 158 in file main.s
+
+next60 000000BA
+
+Symbol: next60
+   Definitions
+      At line 160 in file main.s
+   Uses
+      At line 156 in file main.s
+      At line 181 in file main.s
+
+next80 000000EA
+
+Symbol: next80
+   Definitions
+      At line 183 in file main.s
+   Uses
+      At line 179 in file main.s
+      At line 204 in file main.s
+
+skip0 00000168
 
 Symbol: skip0
    Definitions
-      At line 181 in file main.s
+      At line 242 in file main.s
    Uses
-      At line 179 in file main.s
+      At line 240 in file main.s
 Comment: skip0 used once
-skip100 000000E4
+skip100 0000013C
 
 Symbol: skip100
    Definitions
-      At line 166 in file main.s
+      At line 221 in file main.s
    Uses
-      At line 164 in file main.s
+      At line 219 in file main.s
 Comment: skip100 used once
-skip20 0000005C
+skip20 0000007C
 
 Symbol: skip20
    Definitions
-      At line 102 in file main.s
+      At line 129 in file main.s
    Uses
-      At line 99 in file main.s
+      At line 126 in file main.s
 Comment: skip20 used once
-skip40 0000007E
+skip40 000000AC
 
 Symbol: skip40
    Definitions
-      At line 118 in file main.s
+      At line 152 in file main.s
    Uses
-      At line 116 in file main.s
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 150 in file main.s
 Comment: skip40 used once
-skip60 000000A0
+skip60 000000DC
 
 Symbol: skip60
    Definitions
-      At line 134 in file main.s
+      At line 175 in file main.s
    Uses
-      At line 132 in file main.s
+      At line 173 in file main.s
 Comment: skip60 used once
-skip80 000000C2
+skip80 0000010C
 
 Symbol: skip80
    Definitions
-      At line 150 in file main.s
+      At line 198 in file main.s
    Uses
-      At line 148 in file main.s
+      At line 196 in file main.s
 Comment: skip80 used once
-19 symbols
+28 symbols
 
 
 
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Absolute symbols
 
+Brth2Off 0000C350
+
+Symbol: Brth2Off
+   Definitions
+      At line 54 in file main.s
+   Uses
+      At line 280 in file main.s
+Comment: Brth2Off used once
+Brth2On 00030D40
+
+Symbol: Brth2On
+   Definitions
+      At line 53 in file main.s
+   Uses
+      At line 279 in file main.s
+Comment: Brth2On used once
+Brth4Off 000186A0
+
+Symbol: Brth4Off
+   Definitions
+      At line 56 in file main.s
+   Uses
+      At line 283 in file main.s
+Comment: Brth4Off used once
+Brth4On 000249F0
+
+Symbol: Brth4On
+   Definitions
+      At line 55 in file main.s
+   Uses
+      At line 282 in file main.s
+Comment: Brth4On used once
+Brth6Off 000249F0
+
+Symbol: Brth6Off
+   Definitions
+      At line 58 in file main.s
+   Uses
+      At line 286 in file main.s
+Comment: Brth6Off used once
+Brth6On 000186A0
+
+Symbol: Brth6On
+   Definitions
+      At line 57 in file main.s
+   Uses
+      At line 285 in file main.s
+Comment: Brth6On used once
+Brth8Off 00030D40
+
+Symbol: Brth8Off
+   Definitions
+      At line 60 in file main.s
+   Uses
+      At line 289 in file main.s
+Comment: Brth8Off used once
+Brth8On 0000C350
+
+Symbol: Brth8On
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Absolute symbols
+
+   Definitions
+      At line 59 in file main.s
+   Uses
+      At line 288 in file main.s
+Comment: Brth8On used once
+BrthOff 0003D090
+
+Symbol: BrthOff
+   Definitions
+      At line 52 in file main.s
+   Uses
+      At line 295 in file main.s
+Comment: BrthOff used once
+BrthOn 0003D090
+
+Symbol: BrthOn
+   Definitions
+      At line 51 in file main.s
+   Uses
+      At line 291 in file main.s
+Comment: BrthOn used once
 EightyOff 001E8480
 
 Symbol: EightyOff
    Definitions
       At line 49 in file main.s
    Uses
-      At line 152 in file main.s
+      At line 200 in file main.s
 Comment: EightyOff used once
 EightyOn 0007A120
 
@@ -618,7 +968,7 @@ Symbol: EightyOn
    Definitions
       At line 48 in file main.s
    Uses
-      At line 151 in file main.s
+      At line 199 in file main.s
 Comment: EightyOn used once
 FortyOff 000F4240
 
@@ -626,7 +976,7 @@ Symbol: FortyOff
    Definitions
       At line 45 in file main.s
    Uses
-      At line 120 in file main.s
+      At line 154 in file main.s
 Comment: FortyOff used once
 FortyOn 0016E360
 
@@ -634,7 +984,7 @@ Symbol: FortyOn
    Definitions
       At line 44 in file main.s
    Uses
-      At line 119 in file main.s
+      At line 153 in file main.s
 Comment: FortyOn used once
 GPIO_PORTE_AFSEL_R 40024420
 
@@ -642,7 +992,13 @@ Symbol: GPIO_PORTE_AFSEL_R
    Definitions
       At line 33 in file main.s
    Uses
-      At line 85 in file main.s
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Absolute symbols
+
+      At line 103 in file main.s
 Comment: GPIO_PORTE_AFSEL_R used once
 GPIO_PORTE_DATA_R 400243FC
 
@@ -650,12 +1006,13 @@ Symbol: GPIO_PORTE_DATA_R
    Definitions
       At line 31 in file main.s
    Uses
-      At line 95 in file main.s
-      At line 112 in file main.s
-      At line 128 in file main.s
-      At line 144 in file main.s
-      At line 160 in file main.s
-      At line 175 in file main.s
+      At line 122 in file main.s
+      At line 146 in file main.s
+      At line 169 in file main.s
+      At line 192 in file main.s
+      At line 215 in file main.s
+      At line 236 in file main.s
+      At line 256 in file main.s
 
 GPIO_PORTE_DEN_R 4002451C
 
@@ -663,13 +1020,7 @@ Symbol: GPIO_PORTE_DEN_R
    Definitions
       At line 34 in file main.s
    Uses
-
-
-
-ARM Macro Assembler    Page 2 Alphabetic symbol ordering
-Absolute symbols
-
-      At line 88 in file main.s
+      At line 106 in file main.s
 Comment: GPIO_PORTE_DEN_R used once
 GPIO_PORTE_DIR_R 40024400
 
@@ -677,7 +1028,7 @@ Symbol: GPIO_PORTE_DIR_R
    Definitions
       At line 32 in file main.s
    Uses
-      At line 82 in file main.s
+      At line 100 in file main.s
 Comment: GPIO_PORTE_DIR_R used once
 GPIO_PORTF_AFSEL_R 40025420
 
@@ -685,7 +1036,7 @@ Symbol: GPIO_PORTF_AFSEL_R
    Definitions
       At line 38 in file main.s
    Uses
-      At line 71 in file main.s
+      At line 83 in file main.s
 Comment: GPIO_PORTF_AFSEL_R used once
 GPIO_PORTF_DATA_R 400253FC
 
@@ -693,15 +1044,27 @@ Symbol: GPIO_PORTF_DATA_R
    Definitions
       At line 36 in file main.s
    Uses
-      None
-Comment: GPIO_PORTF_DATA_R unused
+      At line 113 in file main.s
+      At line 138 in file main.s
+      At line 161 in file main.s
+      At line 184 in file main.s
+      At line 207 in file main.s
+      At line 229 in file main.s
+      At line 296 in file main.s
+
 GPIO_PORTF_DEN_R 4002551C
 
 Symbol: GPIO_PORTF_DEN_R
    Definitions
       At line 40 in file main.s
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Absolute symbols
+
    Uses
-      At line 77 in file main.s
+      At line 89 in file main.s
 Comment: GPIO_PORTF_DEN_R used once
 GPIO_PORTF_DIR_R 40025400
 
@@ -709,7 +1072,7 @@ Symbol: GPIO_PORTF_DIR_R
    Definitions
       At line 37 in file main.s
    Uses
-      At line 68 in file main.s
+      At line 80 in file main.s
 Comment: GPIO_PORTF_DIR_R used once
 GPIO_PORTF_PUR_R 40025510
 
@@ -717,29 +1080,24 @@ Symbol: GPIO_PORTF_PUR_R
    Definitions
       At line 39 in file main.s
    Uses
-      At line 74 in file main.s
+      At line 86 in file main.s
 Comment: GPIO_PORTF_PUR_R used once
 SYSCTL_RCGCGPIO_R 400FE608
 
 Symbol: SYSCTL_RCGCGPIO_R
    Definitions
-      At line 50 in file main.s
-   Uses
       At line 62 in file main.s
-Comment: SYSCTL_RCGCGPIO_R used once
+   Uses
+      At line 74 in file main.s
+      At line 94 in file main.s
+
 SixtyOff 0016E360
-
-
-
-ARM Macro Assembler    Page 3 Alphabetic symbol ordering
-Absolute symbols
-
 
 Symbol: SixtyOff
    Definitions
       At line 47 in file main.s
    Uses
-      At line 136 in file main.s
+      At line 177 in file main.s
 Comment: SixtyOff used once
 SixtyOn 000F4240
 
@@ -747,7 +1105,7 @@ Symbol: SixtyOn
    Definitions
       At line 46 in file main.s
    Uses
-      At line 135 in file main.s
+      At line 176 in file main.s
 Comment: SixtyOn used once
 TwentyOff 0007A120
 
@@ -755,7 +1113,7 @@ Symbol: TwentyOff
    Definitions
       At line 43 in file main.s
    Uses
-      At line 104 in file main.s
+      At line 131 in file main.s
 Comment: TwentyOff used once
 TwentyOn 001E8480
 
@@ -763,9 +1121,15 @@ Symbol: TwentyOn
    Definitions
       At line 42 in file main.s
    Uses
-      At line 103 in file main.s
+      At line 130 in file main.s
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Absolute symbols
+
 Comment: TwentyOn used once
-18 symbols
+28 symbols
 
 
 
@@ -776,9 +1140,9 @@ TExaS_Init 00000000
 
 Symbol: TExaS_Init
    Definitions
-      At line 52 in file main.s
+      At line 64 in file main.s
    Uses
-      At line 58 in file main.s
+      At line 70 in file main.s
 Comment: TExaS_Init used once
 1 symbol
-371 symbols in table
+390 symbols in table
