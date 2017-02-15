@@ -50,15 +50,7 @@ EightyOff		   EQU 0x001E8480
 ;Constants for 80Hz frequency. Same format
 BrthOn			   EQU 0x0003D090
 BrthOff			   EQU 0x0003D090	
-Brth2On            EQU 0x00030D40	
-Brth2Off           EQU 0x0000C350
-Brth4On			   EQU 0x000249F0
-Brth4Off           EQU 0x000186A0
-Brth6On            EQU 0x000186A0
-Brth6Off           EQU 0x000249F0
-Brth8On            EQU 0x0000C350
-Brth8Off           EQU 0x00030D40	
-	
+Uno				   EQU 0x000009C4
 SYSCTL_RCGCGPIO_R  EQU 0x400FE608
 	
        IMPORT  TExaS_Init
@@ -275,24 +267,21 @@ Poll
 		
 Breathe    									;The Breathe function goes through the duty cycles without checking to see 
 	MOV R4, LR 								;if PE1 is pressed. R13 is pushed because the Breathe subroutine calls the
+	
 Bloop										;dutyloop subroutine in order to have a delay, however new variable, 
-	LDR R0, =Brth2On						; Brth#On/Off accounts for a faster Hz in order to have breathing effect.
-	LDR R3, =Brth2Off
+	LDR R0, =BrthOn							; Brth#On/Off accounts for a faster Hz in order to have breathing effect.
+	MOV R3, #0
+	LDR R1, =Uno
+	
+Loopception
+	SUB R0, R0, R1
+	ADD R3, R3, R1				; % counter
+    MOV R2, R3
 	BL dutyloop
-	LDR R0, =Brth4On
-	LDR R3, =Brth4Off
-	BL dutyloop
-	LDR R0, =Brth6On
-	LDR R3, =Brth6Off
-	BL dutyloop
-	LDR R0, =Brth8On
-	LDR R3, =Brth8Off
-	BL dutyloop
-	LDR R0, =BrthOn
-	MOV R3, #0x01
-	BL dutyloop
-	MOV R0, #0x01
-	LDR R3, =BrthOff
+	LDR R12, =BrthOn
+	CMP R2, R12
+	BNE Loopception
+		
 	LDR R1, =GPIO_PORTF_DATA_R
 	LDR R0, [R1]
 	CMP R0, #0
