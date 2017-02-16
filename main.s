@@ -280,6 +280,10 @@ Loopception
 	ADD R3, R3, R1							;Certain Percantage of constant "Brth" is added
     MOV R5, R3								
 	MOV R6, R0								; Registers in the dutyloop subroutine modify R3 and R0. Saving in R5, R6.
+	LDR R7, =GPIO_PORTF_DATA_R			;Checking to see if PF4 is not pressed anymore
+	LDR R8, [R7]
+	CMP R8, #0
+	BNE Leave
 	BL dutyloop
 	MOV R0, R6								; Reloading registers
 	MOV R3, R5	
@@ -296,16 +300,15 @@ Loopception2
 	ADD R0, R0, R1				
     MOV R5, R0
 	MOV R6, R3
+	LDR R7, =GPIO_PORTF_DATA_R			;Checking to see if PF4 is not pressed anymore
+	LDR R8, [R7]
+	CMP R8, #0
+	BNE Leave
 	BL dutyloop
 	MOV R3, R6
 	MOV R0, R5	
 	SUBS R12, R12, #1
 	BNE Loopception2
-	
-	LDR R1, =GPIO_PORTF_DATA_R			;Checking to see if PF4 is not pressed anymore
-	LDR R0, [R1]
-	CMP R0, #0
-	BNE Leave
 	B	Bloop 							;Bloop serves to not Push R13 every time
 Leave
 	MOV LR, R4

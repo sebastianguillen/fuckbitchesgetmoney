@@ -143,7 +143,7 @@ ARM Macro Assembler    Page 3
                                                             rupts
    64 00000006         
    65 00000006         ;Initializing Port F;
-   66 00000006 4981            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
+   66 00000006 4985            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
                                                             ivate clock for Por
                                                             t F
    67 00000008 6808            LDR              R0, [R1]
@@ -154,23 +154,23 @@ ARM Macro Assembler    Page 3
    71 00000012 BF00            NOP                          ; allow time for cl
                                                             ock to finish      
                                                             
-   72 00000014 497E            LDR              R1, =GPIO_PORTF_DIR_R ; 5) set 
+   72 00000014 4982            LDR              R1, =GPIO_PORTF_DIR_R ; 5) set 
                                                             direction register
    73 00000016 F04F 0000       MOV              R0,#0x00    ; PF4 is input
    74 0000001A 6008            STR              R0, [R1]
-   75 0000001C 497D            LDR              R1, =GPIO_PORTF_AFSEL_R ; 6) re
+   75 0000001C 4981            LDR              R1, =GPIO_PORTF_AFSEL_R ; 6) re
                                                             gular port function
                                                             
    76 0000001E F04F 0000       MOV              R0, #0      ; 0 means disable a
                                                             lternate function 
    77 00000022 6008            STR              R0, [R1]
-   78 00000024 497C            LDR              R1, =GPIO_PORTF_PUR_R ; pull-up
+   78 00000024 4980            LDR              R1, =GPIO_PORTF_PUR_R ; pull-up
                                                              resistors for PF4,
                                                             PF0
    79 00000026 F04F 0010       MOV              R0, #0x10   ; enable weak pull-
                                                             up on PF0 and PF4
    80 0000002A 6008            STR              R0, [R1]
-   81 0000002C 497B            LDR              R1, =GPIO_PORTF_DEN_R ; 7) enab
+   81 0000002C 497F            LDR              R1, =GPIO_PORTF_DEN_R ; 7) enab
                                                             le Port F digital p
                                                             ort
    82 0000002E F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
@@ -178,7 +178,7 @@ ARM Macro Assembler    Page 3
    83 00000032 6008            STR              R0, [R1]
    84 00000034         
    85 00000034         ;Initializing Port E               
-   86 00000034 4975            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
+   86 00000034 4979            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
                                                             ivate clock for Por
                                                             t E
    87 00000036 6808            LDR              R0, [R1]
@@ -187,11 +187,11 @@ ARM Macro Assembler    Page 3
    89 0000003C 6008            STR              R0, [R1]
    90 0000003E BF00            NOP
    91 00000040 BF00            NOP
-   92 00000042 4977            LDR              R1, =GPIO_PORTE_DIR_R ; 5) set 
+   92 00000042 497B            LDR              R1, =GPIO_PORTE_DIR_R ; 5) set 
                                                             direction register
    93 00000044 F04F 0001       MOV              R0,#0x01    ; PE0 is output
    94 00000048 6008            STR              R0, [R1]
-   95 0000004A 4976            LDR              R1, =GPIO_PORTE_AFSEL_R ; 6) re
+   95 0000004A 497A            LDR              R1, =GPIO_PORTE_AFSEL_R ; 6) re
                                                             gular port function
 
 
@@ -203,7 +203,7 @@ ARM Macro Assembler    Page 4
    96 0000004C F04F 0000       MOV              R0, #0      ; 0 means disable a
                                                             lternate function 
    97 00000050 6008            STR              R0, [R1]
-   98 00000052 4975            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
+   98 00000052 4979            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
                                                             le Port E digital p
                                                             ort
    99 00000054 F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
@@ -213,7 +213,7 @@ ARM Macro Assembler    Page 4
   102 0000005A         loop
   103 0000005A         
   104 0000005A         Default20
-  105 0000005A 4974            LDR              R1, =GPIO_PORTF_DATA_R
+  105 0000005A 4978            LDR              R1, =GPIO_PORTF_DATA_R
   106 0000005C 6808            LDR              R0, [R1]
   107 0000005E 2800            CMP              R0, #0      ;Checking to see if
                                                              PF4 is pressed
@@ -230,7 +230,7 @@ ARM Macro Assembler    Page 4
                                                              indicator of when 
                                                             the button was pres
                                                             sed
-  114 0000006C 4970            LDR              R1, =GPIO_PORTE_DATA_R
+  114 0000006C 4974            LDR              R1, =GPIO_PORTE_DATA_R
   115 0000006E 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
   116 00000070 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
@@ -243,10 +243,10 @@ ARM Macro Assembler    Page 4
                                                             ushed AND released
   120 0000007C         
   121 0000007C         skip20
-  122 0000007C 486D            LDR              R0, =TwentyOn ;R0 will serve as
+  122 0000007C 4871            LDR              R0, =TwentyOn ;R0 will serve as
                                                              the constant for t
                                                             he On time period
-  123 0000007E 4B6E            LDR              R3, =TwentyOff ;R3 will serve a
+  123 0000007E 4B72            LDR              R3, =TwentyOff ;R3 will serve a
                                                             s the constant for 
                                                             the Off time period
                                                             
@@ -268,7 +268,7 @@ ARM Macro Assembler    Page 5
                                                             hen 20% continues
   128 0000008A         
   129 0000008A         next40
-  130 0000008A 4968            LDR              R1, =GPIO_PORTF_DATA_R
+  130 0000008A 496C            LDR              R1, =GPIO_PORTF_DATA_R
   131 0000008C 6808            LDR              R0, [R1]
   132 0000008E 2800            CMP              R0, #0      ;Checking to see if
                                                              PF4 is pressed
@@ -280,7 +280,7 @@ ARM Macro Assembler    Page 5
                                                             s, LED goes Off
   136 00000098         Begin40
   137 00000098 F002 0200       AND              R2, R2, #0
-  138 0000009C 4964            LDR              R1, =GPIO_PORTE_DATA_R
+  138 0000009C 4968            LDR              R1, =GPIO_PORTE_DATA_R
   139 0000009E 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
   140 000000A0 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
@@ -292,8 +292,8 @@ ARM Macro Assembler    Page 5
                                                             2 returns 0x02 if p
                                                             ushed AND released
   144 000000AC         skip40
-  145 000000AC 4863            LDR              R0, =FortyOn
-  146 000000AE 4B64            LDR              R3, =FortyOff
+  145 000000AC 4867            LDR              R0, =FortyOn
+  146 000000AE 4B68            LDR              R3, =FortyOff
   147 000000B0 2A02            CMP              R2, #2
   148 000000B2 D002            BEQ              next60      ; If pressed, 60% i
                                                             s called
@@ -303,7 +303,7 @@ ARM Macro Assembler    Page 5
                                                             hen 40% continues
   151 000000BA         
   152 000000BA         next60
-  153 000000BA 495C            LDR              R1, =GPIO_PORTF_DATA_R
+  153 000000BA 4960            LDR              R1, =GPIO_PORTF_DATA_R
   154 000000BC 6808            LDR              R0, [R1]
   155 000000BE 2800            CMP              R0, #0      ;Checking to see if
                                                              PF4 is pressed
@@ -315,7 +315,7 @@ ARM Macro Assembler    Page 5
                                                             s, LED goes Off
   159 000000C8         Begin60
   160 000000C8 F002 0200       AND              R2, R2, #0
-  161 000000CC 4958            LDR              R1, =GPIO_PORTE_DATA_R
+  161 000000CC 495C            LDR              R1, =GPIO_PORTE_DATA_R
   162 000000CE 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
   163 000000D0 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
@@ -333,8 +333,8 @@ ARM Macro Assembler    Page 6
                                                             2 returns 0x02 if p
                                                             ushed AND released
   167 000000DC         skip60
-  168 000000DC 4858            LDR              R0, =SixtyOn
-  169 000000DE 4B57            LDR              R3, =SixtyOff
+  168 000000DC 485C            LDR              R0, =SixtyOn
+  169 000000DE 4B5B            LDR              R3, =SixtyOff
   170 000000E0 2A02            CMP              R2, #2
   171 000000E2 D002            BEQ              next80      ; If pressed, 80% i
                                                             s called
@@ -342,7 +342,7 @@ ARM Macro Assembler    Page 6
   173 000000E8 E7E7            B                next60      ; 60% continues
   174 000000EA         
   175 000000EA         next80
-  176 000000EA 4950            LDR              R1, =GPIO_PORTF_DATA_R
+  176 000000EA 4954            LDR              R1, =GPIO_PORTF_DATA_R
   177 000000EC 6808            LDR              R0, [R1]
   178 000000EE 2800            CMP              R0, #0      ;Checking to see if
                                                              PF4 is pressed
@@ -354,7 +354,7 @@ ARM Macro Assembler    Page 6
                                                             s, LED goes Off
   182 000000F8         Begin80
   183 000000F8 F002 0200       AND              R2, R2, #0
-  184 000000FC 494C            LDR              R1, =GPIO_PORTE_DATA_R
+  184 000000FC 4950            LDR              R1, =GPIO_PORTE_DATA_R
   185 000000FE 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
   186 00000100 F000 0002       AND              R0, R0, #0x02 ;Bitmasking
@@ -366,8 +366,8 @@ ARM Macro Assembler    Page 6
                                                             2 returns 0x02 if p
                                                             ushed AND released
   190 0000010C         skip80
-  191 0000010C 484A            LDR              R0, =EightyOn
-  192 0000010E 4B49            LDR              R3, =EightyOff
+  191 0000010C 484E            LDR              R0, =EightyOn
+  192 0000010E 4B4D            LDR              R3, =EightyOff
   193 00000110 2A02            CMP              R2, #2
   194 00000112 D002            BEQ              next100     ; If pressed, 100% 
                                                             is called
@@ -375,7 +375,7 @@ ARM Macro Assembler    Page 6
   196 00000118 E7E7            B                next80      ; 80% continues
   197 0000011A         
   198 0000011A         next100
-  199 0000011A 4944            LDR              R1, =GPIO_PORTF_DATA_R
+  199 0000011A 4948            LDR              R1, =GPIO_PORTF_DATA_R
   200 0000011C 6808            LDR              R0, [R1]
   201 0000011E 2800            CMP              R0, #0      ;Checking to see if
                                                              PF4 is pressed
@@ -387,7 +387,7 @@ ARM Macro Assembler    Page 6
                                                             s, LED goes Off
   205 00000128         Begin100
   206 00000128 F002 0200       AND              R2, R2, #0
-  207 0000012C 4940            LDR              R1, =GPIO_PORTE_DATA_R
+  207 0000012C 4944            LDR              R1, =GPIO_PORTE_DATA_R
 
 
 
@@ -412,7 +412,7 @@ ARM Macro Assembler    Page 7
   218 00000146 E7E8            B                next100
   219 00000148         
   220 00000148         LEDoff
-  221 00000148 4938            LDR              R1, =GPIO_PORTF_DATA_R
+  221 00000148 493C            LDR              R1, =GPIO_PORTF_DATA_R
   222 0000014A 6808            LDR              R0, [R1]
   223 0000014C 2800            CMP              R0, #0      ;Checking to see if
                                                              PF4 is pressed
@@ -422,7 +422,7 @@ ARM Macro Assembler    Page 7
                                                             s     
   226 00000154         BeginLEDoff
   227 00000154 F002 0200       AND              R2, R2, #0
-  228 00000158 4935            LDR              R1, =GPIO_PORTE_DATA_R
+  228 00000158 4939            LDR              R1, =GPIO_PORTE_DATA_R
   229 0000015A 6808            LDR              R0, [R1]    ;Loading input from
                                                              Port E 
   230 0000015C F000 0002       AND              R0, R0, #0x02 ;Bitmasking
@@ -449,7 +449,7 @@ ARM Macro Assembler    Page 7
                                                             ter
   247 0000017A D1FD            BNE              LoopOn      ; Counter, only bra
                                                             nches when at 0
-  248 0000017C 492C            LDR              R1, =GPIO_PORTE_DATA_R
+  248 0000017C 4930            LDR              R1, =GPIO_PORTE_DATA_R
   249 0000017E 6808            LDR              R0, [R1]    ; Loading data from
                                                              Port E into regist
                                                             er
@@ -531,64 +531,70 @@ ARM Macro Assembler    Page 9
                                                             dutyloop subroutine
                                                              modify R3 and R0. 
                                                             Saving in R5, R6.
-  283 000001C4 F7FF FFD8       BL               dutyloop
-  284 000001C8 4630            MOV              R0, R6      ; Reloading registe
-                                                            rs
-  285 000001CA 462B            MOV              R3, R5
-  286 000001CC F1BC 0C01       SUBS             R12, R12, #1 ; Once counter rea
-                                                            ches zero, program 
-                                                            can skip branch
-  287 000001D0 D1F1            BNE              Loopception
-  288 000001D2         
-  289 000001D2 F24C 3350       LDR              R3, =Brth   ; Same routine as L
-                                                            oopception EXCEPT t
-                                                            he R3 and R0 is rev
-                                                            ersed
-  290 000001D6 F04F 0000       MOV              R0, #0      ; This gives the il
-                                                            lusion of the LED c
-                                                            oming down from its
-                                                             brightest peak 
-  291 000001DA F04F 0132       LDR              R1, =Uno    ; and back to its o
-                                                            ff state. 
-  292 000001DE F240 3CE7       LDR              R12, =PercentCnt
-  293 000001E2         Loopception2
-  294 000001E2 F04F 0132       LDR              R1, =Uno
-  295 000001E6 EBA3 0301       SUB              R3, R3, R1
-  296 000001EA 4408            ADD              R0, R0, R1
-  297 000001EC 4605            MOV              R5, R0
-  298 000001EE 461E            MOV              R6, R3
-  299 000001F0 F7FF FFC2       BL               dutyloop
-  300 000001F4 4633            MOV              R3, R6
-  301 000001F6 4628            MOV              R0, R5
-  302 000001F8 F1BC 0C01       SUBS             R12, R12, #1
-  303 000001FC D1F1            BNE              Loopception2
-  304 000001FE         
-  305 000001FE 490B            LDR              R1, =GPIO_PORTF_DATA_R ;Checkin
+  283 000001C4 4F1D            LDR              R7, =GPIO_PORTF_DATA_R ;Checkin
                                                             g to see if PF4 is 
                                                             not pressed anymore
                                                             
-  306 00000200 6808            LDR              R0, [R1]
-  307 00000202 2800            CMP              R0, #0
-  308 00000204 D100            BNE              Leave
-  309 00000206 E7CE            B                Bloop       ;Bloop serves to no
+  284 000001C6 F8D7 8000       LDR              R8, [R7]
+  285 000001CA F1B8 0F00       CMP              R8, #0
+  286 000001CE D123            BNE              Leave
+  287 000001D0 F7FF FFD2       BL               dutyloop
+  288 000001D4 4630            MOV              R0, R6      ; Reloading registe
+                                                            rs
+  289 000001D6 462B            MOV              R3, R5
+  290 000001D8 F1BC 0C01       SUBS             R12, R12, #1 ; Once counter rea
+                                                            ches zero, program 
+                                                            can skip branch
+  291 000001DC D1EB            BNE              Loopception
+  292 000001DE         
+  293 000001DE F24C 3350       LDR              R3, =Brth   ; Same routine as L
+                                                            oopception EXCEPT t
+                                                            he R3 and R0 is rev
+                                                            ersed
+  294 000001E2 F04F 0000       MOV              R0, #0      ; This gives the il
+                                                            lusion of the LED c
+                                                            oming down from its
+                                                             brightest peak 
+  295 000001E6 F04F 0132       LDR              R1, =Uno    ; and back to its o
+                                                            ff state. 
+  296 000001EA F240 3CE7       LDR              R12, =PercentCnt
+  297 000001EE         Loopception2
+  298 000001EE F04F 0132       LDR              R1, =Uno
+  299 000001F2 EBA3 0301       SUB              R3, R3, R1
+  300 000001F6 4408            ADD              R0, R0, R1
+  301 000001F8 4605            MOV              R5, R0
+  302 000001FA 461E            MOV              R6, R3
+  303 000001FC 4F0F            LDR              R7, =GPIO_PORTF_DATA_R ;Checkin
+                                                            g to see if PF4 is 
+                                                            not pressed anymore
+                                                            
+  304 000001FE F8D7 8000       LDR              R8, [R7]
+  305 00000202 F1B8 0F00       CMP              R8, #0
+  306 00000206 D107            BNE              Leave
+  307 00000208 F7FF FFB6       BL               dutyloop
+  308 0000020C 4633            MOV              R3, R6
+  309 0000020E 4628            MOV              R0, R5
+  310 00000210 F1BC 0C01       SUBS             R12, R12, #1
+  311 00000214 D1EB            BNE              Loopception2
+  312 00000216 E7C6            B                Bloop       ;Bloop serves to no
                                                             t Push R13 every ti
                                                             me
-  310 00000208         Leave
-  311 00000208 46A6            MOV              LR, R4
-  312 0000020A 4770            BX               LR
-  313 0000020C         
-  314 0000020C         
-  315 0000020C         
-  316 0000020C                 ALIGN                        ; make sure the end
-                                                             of this section is
-                                                             aligned
-  317 0000020C                 END                          ; end of file
+  313 00000218         Leave
+  314 00000218 46A6            MOV              LR, R4
+  315 0000021A 4770            BX               LR
+  316 0000021C         
 
 
 
 ARM Macro Assembler    Page 10 
 
 
+  317 0000021C         
+  318 0000021C         
+  319 0000021C                 ALIGN                        ; make sure the end
+                                                             of this section is
+                                                             aligned
+  320 0000021C                 END                          ; end of file
               400FE608 
               40025400 
               40025420 
@@ -685,7 +691,7 @@ Symbol: Bloop
    Definitions
       At line 271 in file main.s
    Uses
-      At line 309 in file main.s
+      At line 312 in file main.s
 Comment: Bloop used once
 Breathe 000001A4
 
@@ -718,14 +724,15 @@ Symbol: LEDoff
       At line 215 in file main.s
       At line 239 in file main.s
 
-Leave 00000208
+Leave 00000218
 
 Symbol: Leave
    Definitions
-      At line 310 in file main.s
+      At line 313 in file main.s
    Uses
-      At line 308 in file main.s
-Comment: Leave used once
+      At line 286 in file main.s
+      At line 306 in file main.s
+
 LoopOff 00000186
 
 Symbol: LoopOff
@@ -738,9 +745,9 @@ LoopOn 00000178
 
 
 
-
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Relocatable symbols
+
 
 Symbol: LoopOn
    Definitions
@@ -754,15 +761,15 @@ Symbol: Loopception
    Definitions
       At line 277 in file main.s
    Uses
-      At line 287 in file main.s
+      At line 291 in file main.s
 Comment: Loopception used once
-Loopception2 000001E2
+Loopception2 000001EE
 
 Symbol: Loopception2
    Definitions
-      At line 293 in file main.s
+      At line 297 in file main.s
    Uses
-      At line 303 in file main.s
+      At line 311 in file main.s
 Comment: Loopception2 used once
 Poll 00000194
 
@@ -796,16 +803,16 @@ Symbol: dutyloop
       At line 149 in file main.s
       At line 172 in file main.s
       At line 195 in file main.s
-      At line 283 in file main.s
-      At line 299 in file main.s
+      At line 287 in file main.s
+      At line 307 in file main.s
 
 loop 0000005A
 
 
 
-
 ARM Macro Assembler    Page 4 Alphabetic symbol ordering
 Relocatable symbols
+
 
 Symbol: loop
    Definitions
@@ -865,13 +872,13 @@ Symbol: skip100
    Uses
       At line 211 in file main.s
 Comment: skip100 used once
-skip20 0000007C
 
 
 
 ARM Macro Assembler    Page 5 Alphabetic symbol ordering
 Relocatable symbols
 
+skip20 0000007C
 
 Symbol: skip20
    Definitions
@@ -917,7 +924,7 @@ Symbol: Brth
       At line 51 in file main.s
    Uses
       At line 272 in file main.s
-      At line 289 in file main.s
+      At line 293 in file main.s
 
 EightyOff 001E8480
 
@@ -1015,7 +1022,8 @@ Symbol: GPIO_PORTF_DATA_R
       At line 176 in file main.s
       At line 199 in file main.s
       At line 221 in file main.s
-      At line 305 in file main.s
+      At line 283 in file main.s
+      At line 303 in file main.s
 
 GPIO_PORTF_DEN_R 4002551C
 
@@ -1033,13 +1041,13 @@ Symbol: GPIO_PORTF_DIR_R
    Uses
       At line 72 in file main.s
 Comment: GPIO_PORTF_DIR_R used once
-GPIO_PORTF_PUR_R 40025510
 
 
 
 ARM Macro Assembler    Page 3 Alphabetic symbol ordering
 Absolute symbols
 
+GPIO_PORTF_PUR_R 40025510
 
 Symbol: GPIO_PORTF_PUR_R
    Definitions
@@ -1054,7 +1062,7 @@ Symbol: PercentCnt
       At line 53 in file main.s
    Uses
       At line 275 in file main.s
-      At line 292 in file main.s
+      At line 296 in file main.s
 
 SYSCTL_RCGCGPIO_R 400FE608
 
@@ -1101,9 +1109,9 @@ Uno 00000032
 
 
 
-
 ARM Macro Assembler    Page 4 Alphabetic symbol ordering
 Absolute symbols
+
 
 Symbol: Uno
    Definitions
@@ -1111,8 +1119,8 @@ Symbol: Uno
    Uses
       At line 274 in file main.s
       At line 278 in file main.s
-      At line 291 in file main.s
-      At line 294 in file main.s
+      At line 295 in file main.s
+      At line 298 in file main.s
 
 21 symbols
 
