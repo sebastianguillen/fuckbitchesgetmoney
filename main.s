@@ -1,5 +1,5 @@
 ;****************** main.s ***************
-; Program written by: *Sebastian Guillen Vargas, Michael Neimer*
+; Program written by: *Sebastian Guillen Vargas, Michael Niemer*
 ; Date Created: 2/4/2017
 ; Last Modified: 2/4/2017
 ; Brief description of the program
