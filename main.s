@@ -47,10 +47,10 @@ SixtyOn			   EQU 0x000F4240
 SixtyOff           EQU 0x0016E360
 EightyOn           EQU 0x0007A120 
 EightyOff		   EQU 0x001E8480
-;Constants for 80Hz frequency. Same format
-BrthOn			   EQU 0x0003D090
-BrthOff			   EQU 0x0003D090	
-Uno				   EQU 0x000009C4
+;Constants for Breathingfrequency. Same format
+Brth			   EQU 0x0000C350	
+Uno				   EQU 0x00000032
+PercentCnt		   EQU 0x000003E7	
 SYSCTL_RCGCGPIO_R  EQU 0x400FE608
 	
        IMPORT  TExaS_Init
@@ -269,20 +269,40 @@ Breathe    									;The Breathe function goes through the duty cycles without c
 	MOV R4, LR 								;if PE1 is pressed. R13 is pushed because the Breathe subroutine calls the
 	
 Bloop										;dutyloop subroutine in order to have a delay, however new variable, 
-	LDR R0, =BrthOn							; Brth#On/Off accounts for a faster Hz in order to have breathing effect.
-	MOV R3, #0
-	LDR R1, =Uno
+	LDR R0, =Brth						    ; Brth#On/Off accounts for a faster Hz in order to have breathing effect.
+	MOV R3, #0							
+	LDR R1, =Uno							;R0 will be when the light is on, R3 will be for when its off
+	LDR R12, =PercentCnt					;R1 is one percent of the constant "Brth". R12 is the counter ((1/Uno)-1)
 	
 Loopception
-	SUB R0, R0, R1
-	ADD R3, R3, R1				; % counter
-    MOV R2, R3
+	LDR R1, =Uno							;R1 must be reloaded for security	
+	SUB R0, R0, R1							;Certain Percentage of constant "Brth" is deducted
+	ADD R3, R3, R1							;Certain Percantage of constant "Brth" is added
+    MOV R5, R3								
+	MOV R6, R0								; Registers in the dutyloop subroutine modify R3 and R0. Saving in R5, R6.
 	BL dutyloop
-	LDR R12, =BrthOn
-	CMP R2, R12
+	MOV R0, R6								; Reloading registers
+	MOV R3, R5	
+	SUBS R12, R12, #1						; Once counter reaches zero, program can skip branch
 	BNE Loopception
-		
-	LDR R1, =GPIO_PORTF_DATA_R
+	
+	LDR R3, =Brth							; Same routine as Loopception EXCEPT the R3 and R0 is reversed
+	MOV R0, #0								; This gives the illusion of the LED coming down from its brightest peak	
+	LDR R1, =Uno							; and back to its off state.	
+	LDR R12, =PercentCnt
+Loopception2	
+	LDR R1, =Uno
+	SUB R3, R3, R1
+	ADD R0, R0, R1				
+    MOV R5, R0
+	MOV R6, R3
+	BL dutyloop
+	MOV R3, R6
+	MOV R0, R5	
+	SUBS R12, R12, #1
+	BNE Loopception2
+	
+	LDR R1, =GPIO_PORTF_DATA_R			;Checking to see if PF4 is not pressed anymore
 	LDR R0, [R1]
 	CMP R0, #0
 	BNE Leave
