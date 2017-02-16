@@ -83,7 +83,7 @@ Start
     STR R0, [R1]              
 
 ;Initializing Port E               
-    LDR R1, =SYSCTL_RCGCGPIO_R      ; 1) activate clock for Port F
+    LDR R1, =SYSCTL_RCGCGPIO_R      ; 1) activate clock for Port E
 	LDR R0, [R1]                 
     ORR R0, R0, #0x10               ; set bit 5 to turn on clock
     STR R0, [R1]                  
@@ -95,7 +95,7 @@ Start
     LDR R1, =GPIO_PORTE_AFSEL_R     ; 6) regular port function
     MOV R0, #0                      ; 0 means disable alternate function 
     STR R0, [R1]                                  
-    LDR R1, =GPIO_PORTE_DEN_R       ; 7) enable Port F digital port
+    LDR R1, =GPIO_PORTE_DEN_R       ; 7) enable Port E digital port
     MOV R0, #0xFF                   ; 1 means enable digital I/O
     STR R0, [R1]              
 

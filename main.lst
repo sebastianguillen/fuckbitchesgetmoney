@@ -180,7 +180,7 @@ ARM Macro Assembler    Page 3
    85 00000034         ;Initializing Port E               
    86 00000034 4975            LDR              R1, =SYSCTL_RCGCGPIO_R ; 1) act
                                                             ivate clock for Por
-                                                            t F
+                                                            t E
    87 00000036 6808            LDR              R0, [R1]
    88 00000038 F040 0010       ORR              R0, R0, #0x10 ; set bit 5 to tu
                                                             rn on clock
@@ -204,7 +204,7 @@ ARM Macro Assembler    Page 4
                                                             lternate function 
    97 00000050 6008            STR              R0, [R1]
    98 00000052 4975            LDR              R1, =GPIO_PORTE_DEN_R ; 7) enab
-                                                            le Port F digital p
+                                                            le Port E digital p
                                                             ort
    99 00000054 F04F 00FF       MOV              R0, #0xFF   ; 1 means enable di
                                                             gital I/O
@@ -501,38 +501,60 @@ ARM Macro Assembler    Page 8
                                                              in order to have b
                                                             reathing effect.
   273 000001AA F04F 0300       MOV              R3, #0
-  274 000001AE F04F 0132       LDR              R1, =Uno
-  275 000001B2 F240 3CE7       LDR              R12, =PercentCnt
+  274 000001AE F04F 0132       LDR              R1, =Uno    ;R0 will be when th
+                                                            e light is on, R3 w
+                                                            ill be for when its
+                                                             off
+  275 000001B2 F240 3CE7       LDR              R12, =PercentCnt ;R1 is one per
+                                                            cent of the constan
+                                                            t "Brth". R12 is th
+                                                            e counter ((1/Uno)-
+                                                            1)
   276 000001B6         
   277 000001B6         Loopception
-  278 000001B6 F04F 0132       LDR              R1, =Uno
-  279 000001BA EBA0 0001       SUB              R0, R0, R1
-  280 000001BE 440B            ADD              R3, R3, R1  ; % counter
-  281 000001C0 461D            MOV              R5, R3
-  282 000001C2 4606            MOV              R6, R0
-  283 000001C4 F7FF FFD8       BL               dutyloop
-  284 000001C8 4630            MOV              R0, R6
-  285 000001CA 462B            MOV              R3, R5
-  286 000001CC F1BC 0C01       SUBS             R12, R12, #1
-  287 000001D0 D1F1            BNE              Loopception
-  288 000001D2         
-  289 000001D2 F24C 3350       LDR              R3, =Brth   ; Brth#On/Off accou
-                                                            nts for a faster Hz
+  278 000001B6 F04F 0132       LDR              R1, =Uno    ;R1 must be reloade
+                                                            d for security 
+  279 000001BA EBA0 0001       SUB              R0, R0, R1  ;Certain Percentage
+                                                             of constant "Brth"
+                                                             is deducted
+  280 000001BE 440B            ADD              R3, R3, R1  ;Certain Percantage
 
 
 
 ARM Macro Assembler    Page 9 
 
 
-                                                             in order to have b
-                                                            reathing effect.
-  290 000001D6 F04F 0000       MOV              R0, #0
-  291 000001DA F04F 0132       LDR              R1, =Uno
+                                                             of constant "Brth"
+                                                             is added
+  281 000001C0 461D            MOV              R5, R3
+  282 000001C2 4606            MOV              R6, R0      ; Registers in the 
+                                                            dutyloop subroutine
+                                                             modify R3 and R0. 
+                                                            Saving in R5, R6.
+  283 000001C4 F7FF FFD8       BL               dutyloop
+  284 000001C8 4630            MOV              R0, R6      ; Reloading registe
+                                                            rs
+  285 000001CA 462B            MOV              R3, R5
+  286 000001CC F1BC 0C01       SUBS             R12, R12, #1 ; Once counter rea
+                                                            ches zero, program 
+                                                            can skip branch
+  287 000001D0 D1F1            BNE              Loopception
+  288 000001D2         
+  289 000001D2 F24C 3350       LDR              R3, =Brth   ; Same routine as L
+                                                            oopception EXCEPT t
+                                                            he R3 and R0 is rev
+                                                            ersed
+  290 000001D6 F04F 0000       MOV              R0, #0      ; This gives the il
+                                                            lusion of the LED c
+                                                            oming down from its
+                                                             brightest peak 
+  291 000001DA F04F 0132       LDR              R1, =Uno    ; and back to its o
+                                                            ff state. 
   292 000001DE F240 3CE7       LDR              R12, =PercentCnt
   293 000001E2         Loopception2
   294 000001E2 F04F 0132       LDR              R1, =Uno
   295 000001E6 EBA3 0301       SUB              R3, R3, R1
-  296 000001EA 4408            ADD              R0, R0, R1  ; % counter
+  296 000001EA 4408            ADD              R0, R0, R1
   297 000001EC 4605            MOV              R5, R0
   298 000001EE 461E            MOV              R6, R3
   299 000001F0 F7FF FFC2       BL               dutyloop
@@ -541,7 +563,10 @@ ARM Macro Assembler    Page 9
   302 000001F8 F1BC 0C01       SUBS             R12, R12, #1
   303 000001FC D1F1            BNE              Loopception2
   304 000001FE         
-  305 000001FE 490B            LDR              R1, =GPIO_PORTF_DATA_R
+  305 000001FE 490B            LDR              R1, =GPIO_PORTF_DATA_R ;Checkin
+                                                            g to see if PF4 is 
+                                                            not pressed anymore
+                                                            
   306 00000200 6808            LDR              R0, [R1]
   307 00000202 2800            CMP              R0, #0
   308 00000204 D100            BNE              Leave
@@ -558,6 +583,12 @@ ARM Macro Assembler    Page 9
                                                              of this section is
                                                              aligned
   317 0000020C                 END                          ; end of file
+
+
+
+ARM Macro Assembler    Page 10 
+
+
               400FE608 
               40025400 
               40025420 
